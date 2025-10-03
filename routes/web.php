@@ -27,6 +27,7 @@ use App\Http\Controllers\AdminInstansi\ArsipPKLController;
 use App\Http\Controllers\AdminBidang\DashboardController as AdminBidangDashboardController;
 use App\Http\Controllers\AdminBidang\MonitoringLaporanController;
 use App\Http\Controllers\AdminBidang\KuotaBidangController;
+use App\Http\Controllers\AdminInstansi\ManajemenBidangController;
 use App\Http\Controllers\DokumenController as ControllersDokumenController;
 
 /*
@@ -103,6 +104,11 @@ Route::middleware(['auth', 'role:admin_instansi'])
         Route::resource('/manajemen-admin-bidang', ManajemenAdminBidangController::class);
 
         Route::get('/arsip-pkl', [ArsipPKLController::class, 'index'])->name('arsip-pkl.index');
+
+        Route::get('/manajemen-bidang', [ManajemenBidangController::class, 'index'])->name('manajemen-bidang.index');
+        Route::post('/manajemen-bidang', [ManajemenBidangController::class, 'store'])->name('manajemen-bidang.store');
+        Route::put('/manajemen-bidang/{bidang}', [ManajemenBidangController::class, 'update'])->name('manajemen-bidang.update');
+        Route::delete('/manajemen-bidang/{bidang}', [ManajemenBidangController::class, 'destroy'])->name('manajemen-bidang.destroy');
     });
 
 Route::middleware(['auth', 'role:admin_bidang'])

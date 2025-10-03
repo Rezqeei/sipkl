@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -13,15 +14,34 @@ class BidangSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('bidangs')->truncate();
+        $admin_bidang = User::where('email', 'adminbidang@gmail.com')->first();
 
-            // Masukkan data bidang yang ada di Diskominfo
-            DB::table('bidangs')->insert([
-                ['nama_bidang' => 'Infrastruktur dan Teknologi', 'kuota_maksimal' => 5, 'sisa_kuota' => 5],
-                ['nama_bidang' => 'Aplikasi Informatika', 'kuota_maksimal' => 10, 'sisa_kuota' => 10],
-                ['nama_bidang' => 'Statistik dan Persandian', 'kuota_maksimal' => 3, 'sisa_kuota' => 3],
-                ['nama_bidang' => 'Informasi dan Komunikasi Publik', 'kuota_maksimal' => 4, 'sisa_kuota' => 4],
-                ['nama_bidang' => 'Sekretariat', 'kuota_maksimal' => 5, 'sisa_kuota' => 5],
-            ]);
+        DB::table('bidangs')->delete();
+        DB::table('bidangs')->insert([
+            [
+                'nama_bidang' => 'Infrastruktur dan Teknologi',
+                'id_admin_bidang' => $admin_bidang ? $admin_bidang->id : null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nama_bidang' => 'Aplikasi Informatika',
+                'id_admin_bidang' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nama_bidang' => 'Statistik dan Persandian',
+                'id_admin_bidang' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nama_bidang' => 'Informasi dan Komunikasi Publik',
+                'id_admin_bidang' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        ]);
     }
 }

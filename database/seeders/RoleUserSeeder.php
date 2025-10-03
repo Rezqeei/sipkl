@@ -15,19 +15,19 @@ class RoleUserSeeder extends Seeder
     public function run(): void
     {
         User::create([
-            'name' => 'Admin Instansi',
+            'name' => 'admin_instansi',
             'email' => 'admininstansi@gmail.com',
             'password' => Hash::make('password123'),
             'role' => 'admin_instansi',
         ]);
         User::create([
-            'name' => 'Admin Bidang TI',
+            'name' => 'admin_bidang',
             'email' => 'adminbidang@gmail.com',
             'password' => Hash::make('password123'),
             'role' => 'admin_bidang',
         ]);
         User::create([
-            'name' => 'Mahasiswa',
+            'name' => 'mahasiswa',
             'email' => 'mahasiswa@gmail.com',
             'password' => Hash::make('password123'),
             'role' => 'mahasiswa',

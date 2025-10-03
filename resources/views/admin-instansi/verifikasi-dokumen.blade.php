@@ -1,4 +1,4 @@
-<x-admin-instansi-layout>
+<x-admin-layout>
     <div class="p-6 md:p-10" x-data="{ showModal: false, selectedDokumen: null, selectedAntrian: null }">
         <h1 class="text-3xl font-bold text-gray-800 mb-6">Verifikasi Dokumen Mahasiswa</h1>
 
@@ -76,4 +76,4 @@
             </div>
         </div>
     </div>
-</x-admin-instansi-layout>
+</x-admin-layout>

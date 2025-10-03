@@ -1,4 +1,4 @@
-<x-admin-instansi-layout>
+<x-admin-layout>
     {{-- Menampilkan Kartu Statistik --}}
     <div class="grid grid-cols-4 gap-6">
         <div class="bg-white p-6 rounded-lg shadow">
@@ -35,4 +35,4 @@
             @endforelse
         </ul>
     </div>
-</x-admin-instansi-layout>
+</x-admin-layout>
