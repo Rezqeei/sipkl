@@ -15,6 +15,6 @@ class ArsipPKLController extends Controller
                                          ->orderBy('created_at', 'desc')
                                          ->get();
                                          
-        return view('admin-instansi.arsip-pkl.index', compact('arsipMahasiswa'));
+        return view('admin-instansi.arsip-pkl', compact('arsipMahasiswa'));
     }
 }

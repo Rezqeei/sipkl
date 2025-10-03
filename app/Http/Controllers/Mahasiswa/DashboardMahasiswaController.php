@@ -31,9 +31,9 @@ class DashboardMahasiswaController extends Controller
             'telepon' => '(021) 12345678',
             'email' => 'diskominfo@example.go.id',
         ];
-        $bidangs = Bidang::orderBy('nama_bidang', 'asc')->get();
+        $bidangs = Bidang::all();
 
         // Kirim data 'dinas' ke view.
-        return view('mahasiswa.identitas-dinas', compact('dinas', 'bidangs'));
+        return view('mahasiswa.identitas-dinas', compact('bidangs'));
     }
 }

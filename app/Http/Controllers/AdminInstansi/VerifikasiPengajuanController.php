@@ -17,7 +17,7 @@ class VerifikasiPengajuanController extends Controller
                                     ->get();
 
         // Kirim data tersebut ke view
-        return view('admin-instansi.verifikasi-pengajuan.index', compact('daftarPengajuan'));
+        return view('admin-instansi.verifikasi-antrian', compact('daftarPengajuan'));
     }
 
     /**
@@ -46,6 +46,6 @@ class VerifikasiPengajuanController extends Controller
             ]);
             $message = 'Pengajuan untuk ' . $antrian->nama_lengkap . ' telah DITOLAK.';
         }
-        return redirect()->route('admin-instansi.verifikasi-pengajuan.index')->with('success', $message);
+        return redirect()->route('admin-instansi.verifikasi-antrian.index')->with('success', $message);
     }
 }

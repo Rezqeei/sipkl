@@ -16,10 +16,10 @@ class PenempatanController extends Controller
             $mahasiswaSiap = AntrianPkl::where('status_antrian', 'Dokumen Lengkap')->get();
 
             // 2. Ambil semua bidang yang aktif untuk pilihan dropdown
-            $daftarBidang = Bidang::where('status_aktif', true)->get();
+            // $daftarBidang = Bidang::where('status_aktif', true)->get();
 
             // 3. Kirim kedua data tersebut ke view
-            return view('admin-instansi.penempatan.index', compact('mahasiswaSiap', 'daftarBidang'));
+            return view('admin-instansi.penempatan-mahasiswa');
         }
 
         /**

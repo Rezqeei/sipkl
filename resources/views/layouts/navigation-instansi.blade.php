@@ -15,13 +15,13 @@
                     <x-nav-link :href="route('admin-instansi.dashboard')" :active="request()->routeIs('admin-instansi.dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('admin-instansi.verifikasi-antrian.index')" :active="request()->routeIs('admin-instansi.verifikasi-antrian.*')">
+                    <x-nav-link :href="route('admin-instansi.verifikasi-pengajuan.index')" :active="request()->routeIs('admin-instansi.verifikasi-pengajuan.*')">
                         {{ __('Verifikasi Antrian') }}
                     </x-nav-link>
                     <x-nav-link :href="route('admin-instansi.penempatan.index')" :active="request()->routeIs('admin-instansi.penempatan.*')">
                         {{ __('Penempatan') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('admin-instansi.arsip.index')" :active="request()->routeIs('admin-instansi.arsip.*')">
+                    <x-nav-link :href="route('admin-instansi.arsip-pkl.index')" :active="request()->routeIs('admin-instansi.arsip-pkl.*')">
                         {{ __('Arsip PKL') }}
                     </x-nav-link>
                     
@@ -81,13 +81,13 @@
             <x-responsive-nav-link :href="route('admin-instansi.dashboard')" :active="request()->routeIs('admin-instansi.dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin-instansi.verifikasi-antrian.index')" :active="request()->routeIs('admin-instansi.verifikasi-antrian.*')">
+            <x-responsive-nav-link :href="route('admin-instansi.verifikasi-pengajuan.index')" :active="request()->routeIs('admin-instansi.verifikasi-pengajuan.*')">
                 {{ __('Verifikasi Antrian') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin-instansi.penempatan.index')" :active="request()->routeIs('admin-instansi.penempatan.*')">
                 {{ __('Penempatan') }}
             </x-responsive-nav-link>
-             <x-responsive-nav-link :href="route('admin-instansi.arsip.index')" :active="request()->routeIs('admin-instansi.arsip.*')">
+             <x-responsive-nav-link :href="route('admin-instansi.arsip-pkl.index')" :active="request()->routeIs('admin-instansi.arsip-pkl.*')">
                 {{ __('Arsip PKL') }}
             </x-responsive-nav-link>
             <!-- Menu Baru Responsive -->
