@@ -29,7 +29,7 @@ $isMonitoringActive =
             <ul class="space-y-1">
                 <!-- Beranda -->
                 <li>
-                    <a href="{{ route('admin_bidang.dashboard') }}"
+                    <a href="{{ route('admin-bidang.dashboard') }}"
                         class="flex items-center gap-3 px-4 py-2 rounded-lg transition
                         {{ request()->routeIs('admin_bidang.dashboard') ? 'bg-blue-50 text-blue-700 font-bold shadow-sm' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium' }}">
                         <span class="text-lg">🏠</span>
@@ -39,7 +39,7 @@ $isMonitoringActive =
                 
                 <!-- Konfirmasi Mahasiswa -->
                 <li>
-                    <a href="{{ route('admin_bidang.konfirmasi-mahasiswa') }}"
+                    <a href="{{ route('admin-bidang.konfirmasi-mahasiswa') }}"
                         class="flex items-center gap-3 px-4 py-2 rounded-lg transition
                         {{ request()->routeIs('admin_bidang.konfirmasi-mahasiswa') ? 'bg-blue-50 text-blue-700 font-bold shadow-sm' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -60,14 +60,14 @@ $isMonitoringActive =
                     </button>
                     <ul x-show="open" x-collapse.duration.300ms class="pl-8 space-y-1 mt-1">
                         <li>
-                            <a href="{{ route('admin_bidang.laporan-mingguan') }}"
+                            <a href="{{ route('admin-bidang.laporan-mingguan') }}"
                                 class="block px-4 py-2 rounded-lg transition
                                 {{ request()->routeIs('admin_bidang.laporan-mingguan') ? 'bg-blue-100 text-blue-700 font-bold shadow-sm' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium' }}">
                                 Laporan Mingguan
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('admin_bidang.laporan-akhir') }}"
+                            <a href="{{ route('admin-bidang.laporan-akhir') }}"
                                 class="block px-4 py-2 rounded-lg transition
                                 {{ request()->routeIs('admin_bidang.laporan-akhir') ? 'bg-blue-100 text-blue-700 font-bold shadow-sm' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium' }}">
                                 Laporan Akhir
@@ -78,7 +78,7 @@ $isMonitoringActive =
                 
                 <!-- Kuota Bidang -->
                 <li>
-                    <a href="{{ route('admin_bidang.kuota-bidang') }}"
+                    <a href="{{ route('admin-bidang.kuota-bidang') }}"
                         class="flex items-center gap-3 px-4 py-2 rounded-lg transition
                         {{ request()->routeIs('admin_bidang.kuota-bidang') ? 'bg-blue-50 text-blue-700 font-bold shadow-sm' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7-4h14m-12 4h10m-8 4h6"></path></svg>

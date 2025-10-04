@@ -27,12 +27,13 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
         $user = Auth::user();
-        $redirectRoute = match ($user->role) {
-            'admin_instansi' => 'admin-instansi.dashboard',
-            'admin_bidang' => 'admin-bidang.dashboard',
-            default => 'mahasiswa.dashboard',
-        };
-        return redirect()->route($redirectRoute);
+        if ($user->role === 'admin_instansi') {
+            return redirect()->route('admin-instansi.dashboard');
+        }else if ($user->role === 'admin_bidang') {
+            return redirect()->route('admin-bidang.dashboard');
+        }else {
+            return redirect()->route('mahasiswa.dashboard');
+        }
     }
 
     /**

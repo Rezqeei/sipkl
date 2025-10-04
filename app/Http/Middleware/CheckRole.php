@@ -14,11 +14,11 @@ class CheckRole
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle (Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, string $role): Response
     {
-        if (!Auth::check() || $request->user()->role !== $role) {
-            abort(403, 'AKSES DITOLAK. ANDA TIDAK MEMILIKI HAK UNTUK MENGAKSES HALAMAN INI.');
+        if (!Auth::check() || $request->user()->role === $role) {
+            return $next($request);
         }
-        return $next ($request);
+        abort(403, 'AKSES DITOLAK. ANDA TIDAK MEMILIKI HAK UNTUK MENGAKSES HALAMAN INI.');
     }
 }

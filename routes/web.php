@@ -2,10 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-
-// === KUMPULKAN SEMUA CONTROLLER DI SINI AGAR RAPI ===
-
-// Controller Global
 use App\Http\Controllers\ProfileController;
 
 // Controller untuk Mahasiswa
@@ -25,10 +21,12 @@ use App\Http\Controllers\AdminInstansi\ArsipPKLController;
 
 // Controller untuk Admin Bidang
 use App\Http\Controllers\AdminBidang\DashboardController as AdminBidangDashboardController;
+use App\Http\Controllers\AdminBidang\KonfirmasiMahasiswaController;
 use App\Http\Controllers\AdminBidang\MonitoringLaporanController;
 use App\Http\Controllers\AdminBidang\KuotaBidangController;
 use App\Http\Controllers\AdminInstansi\ManajemenBidangController;
 use App\Http\Controllers\DokumenController as ControllersDokumenController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,14 +39,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function (Request $request) {
-    $user = $request->user();
-    $redirectRoute = match ($user->role) {
-        'admin_instansi' => 'admin-instansi.dashboard',
-        'admin_bidang'   => 'admin-bidang.dashboard',
-        default          => 'mahasiswa.dashboard',
-    };
-    return redirect()->route($redirectRoute);
+Route::get('/dashboard', function () {
+    $user = Auth::user();
+    if ($user->role === 'admin_instansi') {
+        return redirect()->route('admin-instansi.dashboard');
+    } elseif ($user->role === 'admin_bidang') {
+        return redirect()->route('admin-bidang.dashboard');
+    } elseif ($user->role === 'mahasiswa') {
+        return redirect()->route('mahasiswa.dashboard');
+    }
+    return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -113,16 +113,24 @@ Route::middleware(['auth', 'role:admin_instansi'])
 
 Route::middleware(['auth', 'role:admin_bidang'])
     ->prefix('admin-bidang')
-    ->name('admin-bidang.') 
+    ->name('admin-bidang.')
     ->group(function () {
         Route::get('/dashboard', [AdminBidangDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/laporan-mingguan', [MonitoringLaporanController::class, 'indexMingguan'])->name('laporan-mingguan.index');
-        Route::post('/laporan-mingguan/{laporan}', [MonitoringLaporanController::class, 'updateMingguan'])->name('laporan-mingguan.update');
+
+        Route::get('/konfirmasi-mahasiswa', [KonfirmasiMahasiswaController::class, 'index'])->name('konfirmasi-mahasiswa');
+        Route::put('/konfirmasi-mahasiswa/{id}', [KonfirmasiMahasiswaController::class, 'konfirmasi'])->name('konfirmasi-mahasiswa.konfirmasi');
+        Route::delete('/konfirmasi-mahasiswa/{id}', [KonfirmasiMahasiswaController::class, 'destroy'])->name('konfirmasi-mahasiswa.destroy');
+
+        Route::get('/monitoring-laporan/mingguan', [MonitoringLaporanController::class, 'mingguan'])->name('laporan-mingguan');
+
+        Route::get('/monitoring-laporan/akhir', [MonitoringLaporanController::class, 'akhir'])->name('laporan-akhir');
+        Route::get('/monitoring-laporan/{id}/download', [MonitoringLaporanController::class, 'download'])->name('monitoring-laporan.download');
 
         Route::get('/laporan-akhir', [MonitoringLaporanController::class, 'indexAkhir'])->name('laporan-akhir.index');
         Route::post('/laporan-akhir/{laporan_akhir}', [MonitoringLaporanController::class, 'updateAkhir'])->name('laporan-akhir.update');
-        Route::get('/kuota-bidang', [KuotaBidangController::class, 'index'])->name('kuota-bidang.index');
-        Route::post('/kuota-bidang', [KuotaBidangController::class, 'update'])->name('kuota-bidang.update');
+
+        Route::get('/kuota-bidang', [KuotaBidangController::class, 'index'])->name('kuota-bidang');
+        Route::put('/kuota-bidang', [KuotaBidangController::class, 'update'])->name('kuota-bidang.update');
     });
 
 
