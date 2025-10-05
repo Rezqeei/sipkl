@@ -1,30 +1,29 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIPKL - Admin Instansi</title>
-    {{-- Pastikan ini mengarah ke file CSS/JS Anda --}}
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{{ config('app.name', 'Laravel') }} - Admin Instansi</title>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="//unpkg.com/alpinejs" defer></script>
 </head>
-<body class="bg-[#eef3fa]">
-    <div class="flex min-h-screen" x-data="{}">
-        
+<body class="font-sans antialiased">
+    <div class="flex h-screen bg-gray-100">
         
         @include('layouts.navigation-instansi')
-        
-        <div class="flex-1 flex flex-col">
+
+        <div class="flex-1 flex flex-col overflow-hidden lg:ml-64">
             
-            
-            <div class="flex-1 ml-64 pt-16">
-                <main class="p-8">
+            <main class="flex-1 overflow-x-hidden overflow-y-auto pt-16">
+                <div class="container mx-auto px-6 py-8">
                     {{ $slot }}
-                </main>
-            </div>
-            
+                </div>
+            </main>
         </div>
     </div>
-    <script src="//unpkg.com/alpinejs" defer></script>
+    @stack('scripts')
 </body>
 </html>

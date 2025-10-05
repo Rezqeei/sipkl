@@ -13,8 +13,8 @@ class VerifikasiPengajuanController extends Controller
     {
         // Ambil semua data antrian yang statusnya 'Menunggu Verifikasi'
         $daftarPengajuan = AntrianPkl::where('status_antrian', 'Menunggu Verifikasi')
-                                    ->orderBy('created_at', 'asc') // Tampilkan yang paling lama dulu
-                                    ->get();
+            ->orderBy('created_at', 'asc') // Tampilkan yang paling lama dulu
+            ->get();
 
         // Kirim data tersebut ke view
         return view('admin-instansi.verifikasi-antrian', compact('daftarPengajuan'));
@@ -23,7 +23,7 @@ class VerifikasiPengajuanController extends Controller
     /**
      * Memproses keputusan verifikasi (Terima atau Tolak).
      */
-    public function update(Request $request, AntrianPkl $antrian) // Menggunakan Route Model Binding
+    public function update(Request $request, AntrianPkl $antrian) 
     {
         // 1. Validasi input dari form admin
         $request->validate([
@@ -38,14 +38,14 @@ class VerifikasiPengajuanController extends Controller
                 'status_antrian' => 'Diterima',
                 'alasan_penolakan' => null, // Pastikan alasan kosong jika diterima
             ]);
-            $message = 'Pengajuan untuk ' . $antrian->nama_lengkap . ' telah DITERIMA.';
+            $message = 'Pengajuan untuk ' . $antrian->user->name . ' telah DITERIMA.';
         } else { // Jika aksinya 'tolak'
             $antrian->update([
                 'status_antrian' => 'Ditolak',
                 'alasan_penolakan' => $request->alasan_penolakan,
             ]);
-            $message = 'Pengajuan untuk ' . $antrian->nama_lengkap . ' telah DITOLAK.';
+            $message = 'Pengajuan untuk ' . $antrian->user->name . ' telah DITOLAK.';
         }
-        return redirect()->route('admin-instansi.verifikasi-antrian.index')->with('success', $message);
+        return redirect()->route('admin-instansi.verifikasi-pengajuan.index')->with('success', $message);
     }
 }

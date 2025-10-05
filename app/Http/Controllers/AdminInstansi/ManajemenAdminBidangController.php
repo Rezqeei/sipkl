@@ -17,7 +17,7 @@ class ManajemenAdminBidangController extends Controller
     public function index()
     {
         $adminBidangList = User::where('role', 'admin_bidang')->latest()->get();
-        return view('admin-instansi.manajemen-admin-bidang.index', compact('adminBidangList'));
+        return view('admin-instansi.manajemen-admin-bidang', compact('adminBidangList'));
     }
 
     /**

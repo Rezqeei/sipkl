@@ -17,7 +17,7 @@ class VerifikasiDokumenController extends Controller
                                         ->with('dokumen')
                                         ->get();
 
-            return view('admin-instansi.verifikasi-dokumen.index', compact('daftarDokumen'));
+            return view('admin-instansi.verifikasi-dokumen', compact('daftarDokumen'));
         }
 
         /**
