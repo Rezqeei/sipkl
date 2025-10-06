@@ -63,7 +63,7 @@ Route::middleware('auth')->group(function () {
 // ===================================================================
 Route::middleware(['auth', 'role:mahasiswa'])
     ->prefix('mahasiswa')
-    ->name('mahasiswa.') // <-- PENTING: Menambahkan prefix nama 'mahasiswa.'
+    ->name('mahasiswa.')
     ->group(function () {
 
         Route::get('/dashboard', [DashboardMahasiswaController::class, 'index'])->name('dashboard');
@@ -87,7 +87,7 @@ Route::middleware(['auth', 'role:mahasiswa'])
 
 Route::middleware(['auth', 'role:admin_instansi'])
     ->prefix('admin-instansi')
-    ->name('admin-instansi.') // <-- PENTING: Menambahkan titik di akhir
+    ->name('admin-instansi.')
     ->group(function () {
 
         Route::get('/dashboard', [AdminInstansiDashboardController::class, 'index'])->name('dashboard');
@@ -97,6 +97,8 @@ Route::middleware(['auth', 'role:admin_instansi'])
 
         Route::get('/verifikasi-dokumen', [VerifikasiDokumenController::class, 'index'])->name('verifikasi-dokumen.index');
         Route::post('/verifikasi-dokumen/{dokumen}', [VerifikasiDokumenController::class, 'update'])->name('verifikasi-dokumen.update');
+        Route::get('/verifikasi-dokumen/{dokumen}/download/{tipe}', [VerifikasiDokumenController::class, 'download'])->name('verifikasi-dokumen.download');
+
 
         Route::get('/penempatan-mahasiswa', [PenempatanController::class, 'index'])->name('penempatan.index');
         Route::post('/penempatan-mahasiswa', [PenempatanController::class, 'store'])->name('penempatan.store');

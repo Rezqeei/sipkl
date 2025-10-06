@@ -7,6 +7,7 @@ use App\Models\AntrianPKL;
 use App\Models\DokumenPKL;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class DokumenController extends Controller
 {
@@ -14,15 +15,23 @@ class DokumenController extends Controller
     {
         // 1. Cari antrian PKL milik mahasiswa yang statusnya sudah 'Diterima'
         $antrian = AntrianPkl::where('id_pengguna', Auth::id())
-                            ->where('status_antrian', 'Diterima')
-                            ->first();
+            ->where('status_antrian', ['Diterima', 'Revisi Dokumen'])
+            ->first();
 
         // 2. Jika tidak ditemukan, jangan izinkan akses ke halaman upload
         if (!$antrian) {
-            return redirect()->route('mahasiswa.dashboard')->with('error', 'Anda belum bisa mengunggah dokumen. Pastikan pengajuan antrian Anda sudah diterima oleh admin.');
+            // Cek apakah ada pengajuan lain yang sedang aktif untuk memberikan pesan yang lebih sesuai
+            $pengajuanAktif = AntrianPkl::where('id_pengguna', Auth::id())
+                ->whereNotIn('status_antrian', ['Ditolak', 'Selesai', 'Revisi Dokumen'])
+                ->exists();
+            if ($pengajuanAktif) {
+                return redirect()->route('mahasiswa.dashboard')->with('error', 'Anda belum bisa mengunggah dokumen. Mohon tunggu proses verifikasi antrian selesai.');
+            }
+            // Jika tidak ada pengajuan sama sekali, arahkan untuk membuat pengajuan
+            return redirect()->route('mahasiswa.pengajuan.antrian')->with('error', 'Silakan ajukan antrian PKL terlebih dahulu sebelum mengunggah dokumen.');
         }
-        
-        // 3. Jika ditemukan, tampilkan view dan kirim data antrian
+
+        // Jika ditemukan, tampilkan view dan kirim data antrian
         return view('mahasiswa.unggah-dokumen', compact('antrian'));
     }
 
@@ -33,15 +42,16 @@ class DokumenController extends Controller
     {
         // 1. Validasi request untuk kedua file
         $request->validate([
-            'surat_pengantar' => 'required|file|mimes:pdf,docx|max:2048', // maks 2MB
+            'surat_pengantar' => 'required|file|mimes:pdf,docx|max:2048',
             'surat_bankesbangpol' => 'required|file|mimes:pdf,docx|max:2048',
             'antrian_id' => 'required|exists:antrian_pkl,id_antrian',
         ]);
 
         // 2. Cek otorisasi, pastikan antrian ini milik user yang login
         $antrian = AntrianPkl::findOrFail($request->antrian_id);
-        if ($antrian->id_pengguna !== Auth::id()) {
-            abort(403, 'Akses Ditolak');
+        if ($antrian->dokumen) {
+            Storage::disk('public')->delete($antrian->dokumen->file_surat_pengantar);
+            Storage::disk('public')->delete($antrian->dokumen->file_surat_bankesbangpol);
         }
 
         // 3. Proses upload kedua file ke folder storage/app/public/dokumen_pkl
@@ -50,14 +60,15 @@ class DokumenController extends Controller
 
         // 4. Simpan path file ke database
         DokumenPkl::updateOrCreate(
-            ['id_antrian' => $antrian->id_antrian], // Kunci untuk mencari
+            ['id_antrian' => $antrian->id_antrian], 
             [
                 'file_surat_pengantar' => $pathSuratPengantar,
                 'file_surat_bankesbangpol' => $pathBankesbangpol,
                 'status_verifikasi' => 'Menunggu Verifikasi',
+                'catatan_revisi' => null,
             ]
         );
-        
+
         // 5. Ubah status antrian utama
         $antrian->update(['status_antrian' => 'Menunggu Verifikasi Dokumen']);
 
