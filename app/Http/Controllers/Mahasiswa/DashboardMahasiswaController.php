@@ -13,7 +13,7 @@ class DashboardMahasiswaController extends Controller
     public function index()
     {
         // Ambil data antrian terakhir mahasiswa yang login.
-        $antrian = AntrianPKL::where('id_pengguna', Auth::id())->with(['dokumen', 'penempatan.bidang', 'penempatan.laporanMingguan', 'penempatan.laporanAkhir'])->latest()->first();
+        $antrian = AntrianPKL::where('id_pengguna', Auth::id())->with(['dokumen', 'penempatan.bidang','penempatan.pembimbing', 'penempatan.laporanMingguan', 'penempatan.laporanAkhir'])->latest()->first();
 
         // Kirim data 'antrian' ke view.
         return view('mahasiswa.dashboard', compact('antrian'));

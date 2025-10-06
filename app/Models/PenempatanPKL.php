@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\AntrianPKL; 
-use App\Models\Bidang; 
-use App\Models\LaporanMingguan; 
-use App\Models\LaporanAkhir; 
-use App\Models\SuratKeterangan; 
+use App\Models\AntrianPKL;
+use App\Models\Bidang;
+use App\Models\LaporanMingguan;
+use App\Models\LaporanAkhir;
+use App\Models\SuratKeterangan;
 
 class PenempatanPKL extends Model
 {
@@ -19,7 +19,11 @@ class PenempatanPKL extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'id_antrian', 'id_pengguna', 'id_bidang', 'id_pembimbing', 'status_pkl'
+        'id_antrian',
+        'id_pengguna',
+        'id_bidang',
+        'id_pembimbing',
+        'status_pkl'
     ];
 
     public function antrian()
@@ -31,7 +35,10 @@ class PenempatanPKL extends Model
     {
         return $this->belongsTo(Bidang::class, 'id_bidang', 'id');
     }
-
+    public function pembimbing()
+    {
+        return $this->belongsTo(Pembimbing::class, 'id_pembimbing');
+    }
     public function laporanMingguan()
     {
         return $this->hasMany(LaporanMingguan::class, 'id_penempatan', 'id_penempatan');
@@ -41,7 +48,7 @@ class PenempatanPKL extends Model
     {
         return $this->hasOne(LaporanAkhir::class, 'id_penempatan', 'id_penempatan');
     }
-    
+
     public function suratKeterangan()
     {
         return $this->hasOne(SuratKeterangan::class, 'id_penempatan', 'id_penempatan');
