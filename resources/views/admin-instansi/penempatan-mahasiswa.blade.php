@@ -108,14 +108,8 @@
                                     x-text="new Date(selectedAntrian.tgl_berakhir).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })"></span>
                             </p>
 
-                            <div>
-                                <label for="nama_pembimbing" class="block text-sm font-medium text-gray-700">Nama
-                                    Pembimbing</label>
-                                <input type="text" id="nama_pembimbing" name="nama_pembimbing"
-                                    placeholder="Misal: Budi Santoso"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"
-                                    required>
-                            </div>
+                            {{-- PERBAIKAN: Input nama pembimbing sudah dihapus dari sini --}}
+
                         </div>
                     </div>
 

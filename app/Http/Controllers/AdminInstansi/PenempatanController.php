@@ -34,14 +34,13 @@ class PenempatanController extends Controller
         $request->validate([
             'antrian_id' => 'required|exists:antrian_pkl,id_antrian',
             'id_bidang' => 'required|exists:bidangs,id',
-            'nama_pembimbing' => 'required|string|max:255',
         ]);
 
         $antrian = AntrianPKL::find($request->antrian_id);
         $bidang = Bidang::find($request->id_bidang);
-        $pembimbing = Pembimbing::firstOrCreate(
-            ['nama_pembimbing' => $request->nama_pembimbing]
-        );
+        // $pembimbing = Pembimbing::firstOrCreate(
+        //     ['nama_pembimbing' => $request->nama_pembimbing]
+        // );
 
         // 2. Cek apakah kuota bidang masih tersedia
         // if ($bidang->sisa_kuota < $antrian->jumlah_orang) {
@@ -53,8 +52,8 @@ class PenempatanController extends Controller
             'id_antrian' => $antrian->id_antrian,
             'id_pengguna' => $antrian->id_pengguna,
             'id_bidang' => $bidang->id,
-            'id_pembimbing' => $pembimbing->id,
-            'status_pkl' => 'Ditempatkan', // Langsung set status menjadi aktif
+            'id_pembimbing' => null,
+            'status_pkl' => 'Menunggu Konfirmasi Admin Bidang',
         ]);
 
         // 4. Update status antrian utama menjadi selesai
@@ -63,6 +62,6 @@ class PenempatanController extends Controller
         // 5. Kurangi sisa kuota di bidang terkait
         // $bidang->decrement('sisa_kuota', $antrian->jumlah_orang);
 
-        return redirect()->route('admin-instansi.penempatan.index')->with('success', $antrian->user->name . ' berhasil ditempatkan di bidang ' . $bidang->nama_bidang);
+        return redirect()->route('admin-instansi.penempatan.index')->with('success', $antrian->user->name . ' berhasil dikirim di Bidang ' . $bidang->nama_bidang . 'untuk konfirmasi');
     }
 }

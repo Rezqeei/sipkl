@@ -11,6 +11,30 @@
 
                 <h3 class="font-bold text-xl mb-4 text-gray-900">Daftar Mahasiswa Dari Admin Instansi</h3>
 
+                {{-- Notifikasi Sukses/Error dari Redirect --}}
+                @if(session('success'))
+                <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
+                    {{ session('success') }}
+                </div>
+                @endif
+                @if(session('error'))
+                <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                    {{ session('error') }}
+                </div>
+                @endif
+
+                {{-- PERBAIKAN PENTING: Menampilkan Error Validasi --}}
+                @if ($errors->any())
+                <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                    <p class="font-bold">Oops! Ada beberapa masalah:</p>
+                    <ul class="list-disc pl-5 mt-2">
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
+
                 <!-- Tabel Daftar Mahasiswa -->
                 <div class="overflow-x-auto relative shadow-md sm:rounded-lg">
                     <table class="w-full text-sm text-left text-gray-500">
@@ -18,7 +42,7 @@
                             <tr>
                                 <th scope="col" class="py-3 px-6">No</th>
                                 <th scope="col" class="py-3 px-6">Nama Mahasiswa</th>
-                                <th scope="col" class="py-3 px-6">Nim</th>
+                                <th scope="col" class="py-3 px-6">NIM</th>
                                 <th scope="col" class="py-3 px-6">Jurusan</th>
                                 <th scope="col" class="py-3 px-6">Kampus</th>
                                 <th scope="col" class="py-3 px-6">Status Dokumen</th>
@@ -26,136 +50,110 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Contoh Data 1 (Nanti akan diisi oleh Looping PHP dari Controller) -->
+                            @forelse ($daftarPengajuan as $index => $pengajuan)
                             <tr class="bg-white border-b hover:bg-gray-50">
-                                <td class="py-4 px-6">1</td>
-                                <td class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap">Andi</td>
-                                <td class="py-4 px-6">2270001</td>
-                                <td class="py-4 px-6">TI</td>
-                                <td class="py-4 px-6">Unv</td>
-                                <td class="py-4 px-6 text-green-600 font-semibold">Valid</td>
+                                <td class="py-4 px-6">{{ $index + 1 }}</td>
+                                <td class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap">
+                                    {{ $pengajuan->antrian->user->name }}
+                                </td>
+                                <td class="py-4 px-6">{{ $pengajuan->antrian->nim }}</td>
+                                <td class="py-4 px-6">{{ $pengajuan->antrian->jurusan }}</td>
+                                <td class="py-4 px-6">{{ $pengajuan->antrian->nama_kampus }}</td>
+                                <td class="py-4 px-6 text-green-600 font-semibold">
+                                    {{ $pengajuan->antrian->dokumen->status_verifikasi ?? 'Dokumen Lengkap' }}
+                                </td>
                                 <td class="py-4 px-6">
-                                    <a href="#" id="openKonfirmasiModal" class="font-medium text-blue-600 hover:underline">[Detail]</a>
+                                    <a href="#" class="font-medium text-blue-600 hover:underline" x-data=""
+                                        x-on:click.prevent="$dispatch('open-modal', 'konfirmasi-mahasiswa-{{ $pengajuan->id_penempatan }}')">[Detail]</a>
                                 </td>
                             </tr>
-                            <!-- Contoh Data 2 -->
-                            <tr class="bg-white hover:bg-gray-50">
-                                <td class="py-4 px-6">2</td>
-                                <td class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap">Siti</td>
-                                <td class="py-4 px-6">23000003</td>
-                                <td class="py-4 px-6">Statistik</td>
-                                <td class="py-4 px-6">Unv B</td>
-                                <td class="py-4 px-6 text-green-600 font-semibold">Valid</td>
-                                <td class="py-4 px-6">
-                                     <a href="#" class="font-medium text-blue-600 hover:underline">[Detail]</a>
+                            @empty
+                            <tr>
+                                <td colspan="7" class="py-4 px-6 text-center text-gray-500">
+                                    Tidak ada mahasiswa yang menunggu konfirmasi di bidang Anda.
                                 </td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
 
-                
-                <!-- Modal Detail Konfirmasi Mahasiswa -->
-                <div id="konfirmasiModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" style="z-index: 1000;">
-                    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">Detail Mahasiswa</h3>
-                            <button id="closeKonfirmasiModal" class="text-gray-400 hover:text-gray-600">
-                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </button>
-                        </div>
-                        <div class="mt-2 text-sm text-gray-500 space-y-1">
-                            
-                            <!-- Detail Mahasiswa -->
-                            <p><span class="font-semibold text-gray-700">Nama Lengkap:</span> Muhammad Andi</p>
-                            <p><span class="font-semibold text-gray-700">Nim:</span> 2270001</p>
-                            <p><span class="font-semibold text-gray-700">Jurusan:</span> Teknik Informatika</p>
-                            <p><span class="font-semibold text-gray-700">Kampus:</span> Univ</p>
-                            <p><span class="font-semibold text-gray-700">No HP:</span> 08123456789</p>
-                            <p><span class="font-semibold text-gray-700">Email:</span> example@gmail.com</p>
-                            <p><span class="font-semibold text-gray-700">Periode PKL:</span> 24 September - 25 September 2025</p>
-                            <p class="mb-3"><span class="font-semibold text-gray-700">Status Dokumen:</span> <span class="text-green-600">Valid (Sudah diverifikasi Admin Instansi)</span></p>
+                {{-- Loop Modal untuk setiap mahasiswa --}}
+                @foreach ($daftarPengajuan as $pengajuan)
+                <x-modal name="konfirmasi-mahasiswa-{{ $pengajuan->id_penempatan }}" focusable>
+                    <form method="post"
+                        action="{{ route('admin-bidang.konfirmasi-mahasiswa.konfirmasi', $pengajuan->id_penempatan) }}"
+                        class="p-6" x-data="{ action: 'terima' }">
+                        @csrf
+                        @method('put')
 
-                            <!-- Dokumen Download -->
-                            <p class="font-semibold text-gray-700 pt-2 border-t border-gray-100">Dokumen Terkait:</p>
-                            <p>Surat Pengantar Kampus <a href="#" class="text-blue-600 hover:text-blue-800 text-xs font-semibold ml-1">[Download]</a></p>
-                            <p class="mb-3">Surat Berkesanggupan <a href="#" class="text-blue-600 hover:text-blue-800 text-xs font-semibold ml-1">[Download]</a></p>
+                        <h2 class="text-lg font-medium text-gray-900">
+                            Detail Mahasiswa
+                        </h2>
 
-                            <!-- Pilihan Konfirmasi (Radio Buttons) -->
-                            <div class="space-y-2 py-3 border-t border-gray-100">
-                                <label class="inline-flex items-center text-gray-700">
-                                    <input type="radio" name="konfirmasi_status" value="terima" class="form-radio text-green-500 h-4 w-4">
-                                    <span class="ml-2 font-semibold">Terima</span>
-                                </label>
-                                <label class="inline-flex items-center text-gray-700 ml-4">
-                                    <input type="radio" name="konfirmasi_status" value="tolak" class="form-radio text-red-500 h-4 w-4">
-                                    <span class="ml-2 font-semibold">Tolak</span>
-                                </label>
+                        <div class="mt-4 space-y-2 text-sm text-gray-600">
+                            <p><span class="font-semibold text-gray-800">Nama Lengkap:</span> {{
+                                $pengajuan->antrian->user->name }}</p>
+                            <p><span class="font-semibold text-gray-800">NIM:</span> {{ $pengajuan->antrian->nim }}</p>
+                            <p><span class="font-semibold text-gray-800">Jurusan:</span> {{ $pengajuan->antrian->jurusan
+                                }}</p>
+                            <p><span class="font-semibold text-gray-800">Kampus:</span> {{
+                                $pengajuan->antrian->nama_kampus }}</p>
+                            <p><span class="font-semibold text-gray-800">Periode PKL:</span> {{
+                                \Carbon\Carbon::parse($pengajuan->antrian->tgl_mulai)->format('d M Y') }} - {{
+                                \Carbon\Carbon::parse($pengajuan->antrian->tgl_berakhir)->format('d M Y') }}</p>
+
+                            {{-- Aksi Terima/Tolak --}}
+                            <div class="pt-4 border-t">
+                                <div class="space-y-2">
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="action" value="terima" class="form-radio"
+                                            x-model="action" checked>
+                                        <span class="ml-2">Terima</span>
+                                    </label>
+                                    <label class="inline-flex items-center ml-4">
+                                        <input type="radio" name="action" value="tolak" class="form-radio"
+                                            x-model="action">
+                                        <span class="ml-2">Tolak</span>
+                                    </label>
+                                </div>
+
+                                <!-- Input teks untuk nama pembimbing -->
+                                <div x-show="action === 'terima'" class="mt-4">
+                                    <label for="nama_pembimbing-{{$pengajuan->id_penempatan}}"
+                                        class="text-sm font-medium">Nama Pembimbing</label>
+                                    <input type="text" name="nama_pembimbing"
+                                        id="nama_pembimbing-{{$pengajuan->id_penempatan}}"
+                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        placeholder="Ketik nama pembimbing di sini..."
+                                        value="{{ old('nama_pembimbing') }}">
+                                </div>
+
+                                {{-- Text Area Alasan Penolakan --}}
+                                <div x-show="action === 'tolak'" class="mt-2">
+                                    <label for="alasan_penolakan-{{$pengajuan->id_penempatan}}"
+                                        class="text-sm font-medium">Alasan Penolakan</label>
+                                    <textarea name="alasan_penolakan"
+                                        id="alasan_penolakan-{{$pengajuan->id_penempatan}}" rows="2"
+                                        class="w-full border-gray-300 rounded-md shadow-sm">{{ old('alasan_penolakan') }}</textarea>
+                                </div>
                             </div>
-
-                            <!-- Input Alasan Penolakan (Tersembunyi, nanti diatur via JS) -->
-                            <div id="alasanPenolakan" class="hidden">
-                                <label for="alasan" class="block text-sm font-semibold text-gray-700 mb-1">Alasan Penolakan:</label>
-                                <textarea id="alasan" rows="3" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" placeholder="Masukkan alasan penolakan konfirmasi..."></textarea>
-                            </div>
                         </div>
 
-                        <!-- Tombol Aksi -->
-                        <div class="mt-4 flex justify-end">
-                            <button class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                                Simpan
-                            </button>
+                        <div class="mt-6 flex justify-end">
+                            <x-secondary-button x-on:click="$dispatch('close')">
+                                {{ __('Batal') }}
+                            </x-secondary-button>
+
+                            <x-primary-button class="ml-3">
+                                {{ __('Simpan') }}
+                            </x-primary-button>
                         </div>
-                    </div>
-                </div>
+                    </form>
+                </x-modal>
+                @endforeach
 
             </div>
         </div>
     </div>
-
-    @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const konfirmasiModal = document.getElementById('konfirmasiModal');
-            const closeKonfirmasiModalBtn = document.getElementById('closeKonfirmasiModal');
-            const radioButtons = document.querySelectorAll('input[name="konfirmasi_status"]');
-            const alasanPenolakanDiv = document.getElementById('alasanPenolakan');
-            
-            // Fungsi untuk membuka modal (kita memilih semua link detail)
-            document.querySelectorAll('[id^="openKonfirmasiModal"]').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault(); 
-                    konfirmasiModal.classList.remove('hidden');
-                });
-            });
-
-            // Menutup modal
-            if (closeKonfirmasiModalBtn) {
-                closeKonfirmasiModalBtn.addEventListener('click', function() {
-                    konfirmasiModal.classList.add('hidden');
-                });
-            }
-
-            // Logika menampilkan input Alasan Penolakan
-            radioButtons.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    if (this.value === 'tolak') {
-                        alasanPenolakanDiv.classList.remove('hidden');
-                    } else {
-                        alasanPenolakanDiv.classList.add('hidden');
-                    }
-                });
-            });
-
-            // Tutup modal ketika klik di luar area modal
-            if (konfirmasiModal) {
-                konfirmasiModal.addEventListener('click', function(e) {
-                    if (e.target === konfirmasiModal) {
-                        konfirmasiModal.classList.add('hidden');
-                    }
-                });
-            }
-        });
-    </script>
-    @endpush
 </x-admin-bidang-layout>
