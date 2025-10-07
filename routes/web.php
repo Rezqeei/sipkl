@@ -123,7 +123,7 @@ Route::middleware(['auth', 'role:admin_bidang'])
         Route::get('/dashboard', [AdminBidangDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/konfirmasi-mahasiswa', [KonfirmasiMahasiswaController::class, 'index'])->name('konfirmasi-mahasiswa');
-        Route::put('/konfirmasi-mahasiswa/{penempatan}', [KonfirmasiMahasiswaController::class, 'prosesKonfirmasi'])->name('konfirmasi-mahasiswa.konfirmasi');
+        Route::put('/konfirmasi-mahasiswa/{id}', [KonfirmasiMahasiswaController::class, 'konfirmasi'])->name('konfirmasi-mahasiswa.konfirmasi');
         Route::delete('/konfirmasi-mahasiswa/{id}', [KonfirmasiMahasiswaController::class, 'destroy'])->name('konfirmasi-mahasiswa.destroy');
 
         Route::get('/monitoring-laporan/mingguan', [MonitoringLaporanController::class, 'mingguan'])->name('laporan-mingguan');

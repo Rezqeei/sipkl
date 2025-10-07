@@ -57,13 +57,11 @@
                     </button>
                     <ul x-show="open" x-collapse class="pl-8 space-y-1 mt-1">
                         <li>
-                            {{-- Nama rute yang benar: mahasiswa.laporan.mingguan --}}
                             <a href="{{ route('mahasiswa.laporan.mingguan') }}" class="block px-4 py-2 rounded-lg text-sm {{ request()->routeIs('mahasiswa.laporan.mingguan') ? 'bg-blue-100 text-blue-700 font-bold' : 'text-gray-700 hover:bg-gray-100' }}">
                                 Laporan Mingguan
                             </a>
                         </li>
                         <li>
-                            {{-- Nama rute yang benar: mahasiswa.laporan.akhir --}}
                             <a href="{{ route('mahasiswa.laporan.akhir') }}" class="block px-4 py-2 rounded-lg text-sm {{ request()->routeIs('mahasiswa.laporan.akhir') ? 'bg-blue-100 text-blue-700 font-bold' : 'text-gray-700 hover:bg-gray-100' }}">
                                 Laporan Akhir
                             </a>
