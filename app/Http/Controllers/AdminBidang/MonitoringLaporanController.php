@@ -13,115 +13,132 @@ use Illuminate\Support\Facades\Storage;
 
 class MonitoringLaporanController extends Controller
 {
-    public function mingguan()
+    public function showMingguan()
     {
-        // 1. Dapatkan admin bidang yang sedang login.
-        $admin = Auth::user();
-        // 2. Dapatkan bidang yang dikelola oleh admin ini.
-        $bidang = $admin->bidang;
+        // Menggunakan relasi yang sudah diperbaiki: `bidangDikelola`
+        $id_bidang = Auth::user()->bidangDikelola->id ?? null;
 
-        // Siapkan koleksi kosong sebagai nilai default jika admin tidak terhubung ke bidang manapun.
-        $laporanMingguan = collect();
-
-        // 3. Jika admin terhubung ke sebuah bidang, cari laporan mahasiswa di bidang itu.
-        if ($bidang) {
-            // Dapatkan semua ID mahasiswa yang ditempatkan di bidang ini
-            $mahasiswaIds = PenempatanPKL::where('bidang_id', $bidang->id)->pluck('user_id');
-
-            // Dapatkan semua laporan mingguan dari mahasiswa-mahasiswa tersebut,
-            // diurutkan dari yang terbaru, dan sertakan data user (mahasiswa) nya.
-            if ($mahasiswaIds->isNotEmpty()) {
-                $laporanMingguan = LaporanMingguan::with('user')
-                    ->whereIn('user_id', $mahasiswaIds)
-                    ->latest() // Mengurutkan dari yang terbaru
-                    ->get();
-            }
+        if (!$id_bidang) {
+            return view('admin-bidang.laporan-mingguan', ['laporans' => collect()]);
         }
 
-        // 4. Tampilkan view 'laporan-mingguan' dan kirim data laporannya.
-        return view('admin-bidang.laporan-mingguan', compact('laporanMingguan'));
-    }
-    public function akhir()
-    {
-        $admin = Auth::user();
-        $bidang = $admin->bidang;
-        $laporanAkhir = collect();
+        $laporans = LaporanMingguan::whereHas('penempatan', function ($query) use ($id_bidang) {
+            $query->where('id_bidang', $id_bidang);
+        })->with([
+            'penempatan.mahasiswa',
+            'penempatan.antrian'
+        ])->orderBy('created_at', 'desc')->get();
 
-        // 3. Jika admin terhubung ke sebuah bidang, cari laporan mahasiswa di bidang itu.
-        if ($bidang) {
-            // Dapatkan semua ID mahasiswa yang ditempatkan di bidang ini.
-            $mahasiswaIds = PenempatanPKL::where('bidang_id', $bidang->id)->pluck('user_id');
-
-            // Jika ada mahasiswa, ambil semua laporan akhir mereka.
-            if ($mahasiswaIds->isNotEmpty()) {
-                $laporanAkhir = LaporanAkhir::with('user')
-                    ->whereIn('user_id', $mahasiswaIds)
-                    ->latest()
-                    ->get();
-            }
-        }
-
-        // 4. Tampilkan view 'laporan-akhir' dan kirim data laporannya.
-        return view('admin-bidang.laporan-akhir', compact('laporanAkhir'));
+        return view('admin-bidang.laporan-mingguan', compact('laporans'));
     }
 
     /**
-     * Memproses keputusan verifikasi laporan akhir.
+     * Memverifikasi status laporan mingguan.
      */
-    public function updateAkhir(Request $request, LaporanAkhir $laporan_akhir)
+    public function verifyMingguan(Request $request, $id_laporan)
     {
-        // Otorisasi
-        if (Auth::user()->bidang->id !== $laporan_akhir->penempatan->id_bidang) {
-            throw new AuthorizationException;
+        $request->validate(['status_verifikasi' => 'required|in:Disetujui,Ditolak']);
+        $laporan = LaporanMingguan::findOrFail($id_laporan);
+
+        // --- PERBAIKAN KONDISI OTORISASI ---
+        // Membandingkan ID bidang dari laporan dengan ID bidang yang dikelola admin.
+        if ($laporan->penempatan->id_bidang !== (Auth::user()->bidangDikelola->id ?? null)) {
+            return redirect()->back()->with('error', 'Akses ditolak.');
         }
 
+        $laporan->update(['status_verifikasi' => $request->status_verifikasi]);
+        return redirect()->back()->with('success', 'Status laporan berhasil diperbarui.');
+    }
+
+    /**
+     * Menampilkan daftar laporan akhir dari mahasiswa di bidang terkait.
+     */
+    public function showAkhir()
+    {
+        $id_bidang = Auth::user()->bidangDikelola->id ?? null;
+
+        if (!$id_bidang) {
+            $laporans = collect();
+            return view('admin-bidang.laporan-akhir', compact('laporans'));
+        }
+
+        $laporans = LaporanAkhir::with(['penempatan.antrian.user'])
+            ->whereHas('penempatan', function ($query) use ($id_bidang) {
+                $query->where('id_bidang', $id_bidang);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('admin-bidang.laporan-akhir', ['laporans' => collect()]);
+    }
+
+    /**
+     * Memverifikasi status laporan akhir.
+     */
+    public function verifyAkhir(Request $request, $id)
+    {
         $request->validate([
-            'action' => 'required|in:setuju,revisi',
-            'feedback' => 'nullable|string|max:1000|required_if:action,revisi',
+            'status_verifikasi' => 'required|in:Disetujui,Ditolak',
         ]);
 
-        if ($request->action === 'setuju') {
-            $laporan_akhir->update([
-                'status_verifikasi' => 'Diterima',
-                'feedback' => null,
-            ]);
+        $laporan = LaporanAkhir::findOrFail($id);
 
-            // PENTING: Ubah status PKL mahasiswa menjadi 'Selesai'
-            $laporan_akhir->penempatan->update(['status_pkl' => 'Selesai']);
-
-
-            $message = 'Laporan akhir telah disetujui dan PKL mahasiswa telah ditandai selesai.';
-        } else {
-            $laporan_akhir->update([
-                'status_verifikasi' => 'Revisi',
-                'feedback' => $request->feedback,
-            ]);
-            $message = 'Laporan akhir ditandai untuk revisi.';
+        if ($laporan->penempatan->id_bidang !== (Auth::user()->bidangDikelola->id ?? null)) {
+            return redirect()->back()->with('error', 'Anda tidak berwenang melakukan aksi ini.');
         }
 
-        return redirect()->back()->with('success', $message);
+        $laporan->status_verifikasi = $request->status_verifikasi;
+        $laporan->save();
+
+        // Jika laporan akhir disetujui, ubah status PKL mahasiswa menjadi 'Selesai'
+        if ($request->status_verifikasi === 'Disetujui') {
+            $laporan->penempatan->update(['status_pkl' => 'Selesai']);
+        }
+
+        return redirect()->back()->with('success', 'Status laporan akhir berhasil diperbarui.');
     }
-     public function download($id)
+
+    /**
+     * Mengunduh file laporan mingguan.
+     */
+    public function downloadMingguan($id_laporan)
     {
-        // Mencoba mencari di LaporanAkhir dulu
-        $laporan = LaporanAkhir::find($id);
-        $disk = 'private'; // Asumsi laporan akhir di disk private
+        $laporan = LaporanMingguan::findOrFail($id_laporan);
 
-        // Jika tidak ketemu di LaporanAkhir, cari di LaporanMingguan
-        if (!$laporan) {
-            $laporan = LaporanMingguan::find($id);
+        // --- PERBAIKAN KONDISI OTORISASI ---
+        // Membandingkan ID bidang dari laporan dengan ID bidang yang dikelola admin.
+        if ($laporan->penempatan->id_bidang !== (Auth::user()->bidangDikelola->id ?? null)) {
+            return redirect()->back()->with('error', 'Akses ditolak.');
         }
 
-        // Jika laporan (baik akhir maupun mingguan) ditemukan
-        if ($laporan) {
-            $filePath = $laporan->file_path ?? $laporan->file_laporan;
-            
-            if (Storage::disk($disk)->exists($filePath)) {
-                $fileName = $laporan->nama_file ?? basename($filePath);
-                // Menggunakan helper response()->download() dengan path absolut dari Storage
-                return response()->download(Storage::disk($disk)->path($filePath), $fileName);
-            }
+        $pathToFile = storage_path('app/public/' . $laporan->file_laporan);
+
+        if (file_exists($pathToFile)) {
+            return response()->download($pathToFile);
         }
-        return redirect()->back()->with('error', 'File laporan tidak ditemukan.');
+
+        return redirect()->back()->with('error', 'File tidak ditemukan.');
+    }
+
+    /**
+     * Mengunduh file laporan akhir.
+     */
+    public function downloadAkhir($id)
+    {
+        $laporan = LaporanAkhir::findOrFail($id);
+
+        // Otorisasi: Pastikan admin hanya bisa unduh laporan di bidangnya
+        if ($laporan->penempatan->id_bidang !== (Auth::user()->bidangDikelola->id ?? null)) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        $pathToFile = $laporan->file_laporan;
+
+        // Cek apakah file ada di disk 'public'
+        if (Storage::disk('public')->exists($pathToFile)) {
+            return response()->download(Storage::disk('public')->path($pathToFile));
+        }
+
+        return redirect()->back()->with('error', 'File laporan akhir tidak ditemukan.');
     }
 }

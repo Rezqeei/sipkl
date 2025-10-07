@@ -26,6 +26,19 @@ class PenempatanPKL extends Model
         'status_pkl'
     ];
 
+    public function mahasiswa()
+    {
+        // hasOneThrough: Satu Penempatan punya satu User MELALUI AntrianPKL
+        return $this->hasOneThrough(
+            User::class,            
+            AntrianPKL::class,      
+            'id_antrian',           
+            'id',                   
+            'id_antrian',           
+            'id_pengguna'           
+        );
+    }
+
     public function antrian()
     {
         return $this->belongsTo(AntrianPKL::class, 'id_antrian', 'id_antrian');

@@ -126,13 +126,16 @@ Route::middleware(['auth', 'role:admin_bidang'])
         Route::put('/konfirmasi-mahasiswa/{id}', [KonfirmasiMahasiswaController::class, 'konfirmasi'])->name('konfirmasi-mahasiswa.konfirmasi');
         Route::delete('/konfirmasi-mahasiswa/{id}', [KonfirmasiMahasiswaController::class, 'destroy'])->name('konfirmasi-mahasiswa.destroy');
 
-        Route::get('/monitoring-laporan/mingguan', [MonitoringLaporanController::class, 'mingguan'])->name('laporan-mingguan');
+        Route::get('/monitoring-laporan/mingguan', [MonitoringLaporanController::class, 'showMingguan'])->name('monitoring.laporan.mingguan');
+        Route::post('/monitoring-laporan/mingguan/{id}/verify', [MonitoringLaporanController::class, 'verifyMingguan'])->name('monitoring.laporan.mingguan.verify');
+        Route::get('/monitoring-laporan/mingguan/{id}/download', [MonitoringLaporanController::class, 'downloadMingguan'])->name('monitoring.laporan.mingguan.download');
 
         Route::get('/monitoring-laporan/akhir', [MonitoringLaporanController::class, 'akhir'])->name('laporan-akhir');
         Route::get('/monitoring-laporan/{id}/download', [MonitoringLaporanController::class, 'download'])->name('monitoring-laporan.download');
 
-        Route::get('/laporan-akhir', [MonitoringLaporanController::class, 'indexAkhir'])->name('laporan-akhir.index');
-        Route::post('/laporan-akhir/{laporan_akhir}', [MonitoringLaporanController::class, 'updateAkhir'])->name('laporan-akhir.update');
+        Route::get('/monitoring-laporan/akhir', [MonitoringLaporanController::class, 'showAkhir'])->name('monitoring.laporan.akhir');
+        Route::post('/monitoring-laporan/akhir/{id}/verify', [MonitoringLaporanController::class, 'verifyAkhir'])->name('monitoring.laporan.akhir.verify');
+        Route::get('/monitoring-laporan/akhir/{id}/download', [MonitoringLaporanController::class, 'downloadAkhir'])->name('monitoring.laporan.akhir.download');
 
         Route::get('/kuota-bidang', [KuotaBidangController::class, 'index'])->name('kuota-bidang');
         Route::put('/kuota-bidang', [KuotaBidangController::class, 'update'])->name('kuota-bidang.update');
