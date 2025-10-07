@@ -103,7 +103,10 @@ Route::middleware(['auth', 'role:admin_instansi'])
         Route::get('/penempatan-mahasiswa', [PenempatanController::class, 'index'])->name('penempatan.index');
         Route::post('/penempatan-mahasiswa', [PenempatanController::class, 'store'])->name('penempatan.store');
 
-        Route::resource('/manajemen-admin-bidang', ManajemenAdminBidangController::class);
+        Route::get('/manajemen-admin-bidang', [ManajemenAdminBidangController::class, 'index'])->name('manajemen-admin-bidang.index');
+        Route::resource('/manajemen-admin-bidang', ManajemenAdminBidangController::class)->except(['index']);
+        Route::resource('/manajemen-bidang', ManajemenBidangController::class)->except(['index', 'show', 'create', 'edit']);
+
 
         Route::get('/arsip-pkl', [ArsipPKLController::class, 'index'])->name('arsip-pkl.index');
 

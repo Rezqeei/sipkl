@@ -81,14 +81,15 @@ $isPenempatanOpen = request()->routeIs('admin-instansi.penempatan.index');
                 </ul>
             </div>
 
-            <a href="{{ route('admin-instansi.manajemen-bidang.index') }}"
+            {{-- --- PERBAIKAN DI SINI --- --}}
+            <a href="{{ route('admin-instansi.manajemen-admin-bidang.index') }}"
                 class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition {{ request()->routeIs('admin-instansi.manajemen-admin-bidang.index') ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-gray-100' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21v-1a6 6 0 00-5.176-5.97m8.352 5.97h.001">
                     </path>
                 </svg>
-                <span>Manajemen Admin Bidang</span>
+                <span>Manajemen Admin & Bidang</span>
             </a>
 
             <a href="{{ route('admin-instansi.arsip-pkl.index') }}"
