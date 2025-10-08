@@ -1,206 +1,133 @@
-<?php
-// --- PERBAIKAN NAMA ROUTE DI SINI ---
-// Variabel ini digunakan untuk mendeteksi apakah menu "Monitoring Laporan" sedang aktif.
-$isMonitoringActive = 
-    request()->routeIs('admin-bidang.monitoring.laporan.mingguan') || 
-    request()->routeIs('admin-bidang.monitoring.laporan.akhir');
-?>
-<div
-    x-data="{ open: false, isManajemenActive: {{ request()->routeIs('admin_bidang.manajemen-admin-bidang') ? 'true' : 'false' }} }">
-    <!-- Overlay for Mobile -->
-    <div x-show="open" x-transition.opacity @click="open = false"
-        class="fixed inset-0 bg-gray-900 bg-opacity-75 z-40 lg:hidden"></div>
+@php
+$isMonitoringActive = request()->routeIs('admin-bidang.monitoring.laporan.mingguan') ||
+request()->routeIs('admin-bidang.monitoring.laporan.akhir');
+@endphp
 
-    <!-- Sidebar -->
-    <aside :class="{'translate-x-0': open, '-translate-x-full': !open}" class="bg-white w-64 min-h-screen shadow-xl flex flex-col fixed h-full z-50 
-                  transform transition-transform duration-300 ease-in-out lg:translate-x-0">
+<div x-show="sidebarOpen" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30" @click="sidebarOpen = false"
+    x-cloak></div>
 
-        <!-- Header Logo -->
-        <div class="flex items-center gap-2 px-6 py-6 border-b">
-            <img src="{{ asset('images/logo.png') }}" alt="SIPKL Logo" class="w-10 h-10">
-            <div>
-                <span class="font-extrabold text-xl text-[#1a3760] tracking-wide">SIPKL</span>
-                <div class="text-xs text-gray-500 font-medium">Admin Bidang</div>
+<aside class="fixed inset-y-0 left-0 bg-white shadow-lg z-40 flex flex-col transition-all duration-300 ease-in-out"
+    :class="{
+        'w-64': !sidebarMinimized,
+        'w-20': sidebarMinimized,
+        'translate-x-0': sidebarOpen,
+        '-translate-x-full': !sidebarOpen,
+        'lg:translate-x-0': true
+    }">
+
+    <div class="flex items-center px-6 h-16 border-b shrink-0 overflow-hidden"
+        :class="sidebarMinimized ? 'justify-center' : 'justify-start'">
+        <a href="{{ route('admin-bidang.dashboard') }}" class="flex items-center gap-3">
+            <img src="{{ asset('images/logo.png') }}" alt="SIPKL Logo" class="w-10 h-10 shrink-0">
+            <div x-show="!sidebarMinimized" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                <span class="font-extrabold text-xl text-[#1a3760] tracking-wide whitespace-nowrap">SIPKL</span>
+                <p class="text-xs text-gray-500 font-medium whitespace-nowrap">Admin Bidang</p>
             </div>
-        </div>
+        </a>
+    </div>
 
-        <!-- Navigation Menu -->
-        <nav class="flex-1 px-4 py-6 overflow-y-auto">
-            <ul class="space-y-1">
-                <!-- Beranda -->
-                <li>
-                    <a href="{{ route('admin-bidang.dashboard') }}"
-                        class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                       {{ request()->routeIs('admin-bidang.dashboard') ? 'bg-blue-50 text-blue-700 font-bold shadow-sm' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium' }}">
-                        <span class="text-lg">🏠</span>
-                        <span class="sidebar-label">Beranda</span>
-                    </a>
-                </li>
-
-                <!-- Konfirmasi Mahasiswa -->
-                <li>
-                    <a href="{{ route('admin-bidang.konfirmasi-mahasiswa') }}"
-                        class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                       {{ request()->routeIs('admin-bidang.konfirmasi-mahasiswa') ? 'bg-blue-50 text-blue-700 font-bold shadow-sm' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="sidebar-label">Konfirmasi Mahasiswa</span>
-                    </a>
-                </li>
-
-                <!-- Dropdown: Monitoring Laporan -->
-                <li x-data="{ open: {{ $isMonitoringActive ? 'true' : 'false' }} }"
-                    class="{{ $isMonitoringActive ? 'bg-blue-50 rounded-lg' : '' }}">
-                    <button @click="open = !open"
-                        class="w-full flex items-center justify-between px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium transition {{ $isMonitoringActive ? 'text-blue-700' : '' }}">
-                        <span class="flex items-center gap-3">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                </path>
-                            </svg>
-                            <span class="sidebar-label">Monitoring Laporan</span>
-                        </span>
-                        <svg :class="{'rotate-180': open}" class="w-4 h-4 transition-transform" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-                    <ul x-show="open" x-collapse.duration.300ms class="pl-8 space-y-1 mt-1">
-                        <li>
-                            {{-- --- PERBAIKAN NAMA ROUTE DI SINI --- --}}
-                            <a href="{{ route('admin-bidang.monitoring.laporan.mingguan') }}"
-                                class="block px-4 py-2 rounded-lg transition
-                               {{ request()->routeIs('admin-bidang.monitoring.laporan.mingguan') ? 'bg-blue-100 text-blue-700 font-bold shadow-sm' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium' }}">
-                                Laporan Mingguan
-                            </a>
-                        </li>
-                        <li>
-                            {{-- --- PERBAIKAN NAMA ROUTE DI SINI --- --}}
-                            <a href="{{ route('admin-bidang.monitoring.laporan.akhir') }}"
-                                class="block px-4 py-2 rounded-lg transition
-                               {{ request()->routeIs('admin-bidang.monitoring.laporan.akhir') ? 'bg-blue-100 text-blue-700 font-bold shadow-sm' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium' }}">
-                                Laporan Akhir
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <!-- Kuota Bidang -->
-                <li>
-                    <a href="{{ route('admin-bidang.kuota-bidang') }}"
-                        class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                       {{ request()->routeIs('admin-bidang.kuota-bidang') ? 'bg-blue-50 text-blue-700 font-bold shadow-sm' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 10h18M3 14h18m-9-4v8m-7-4h14m-12 4h10m-8 4h6"></path>
-                        </svg>
-                        <span class="sidebar-label">Kuota Bidang</span>
-                    </a>
-                </li>
-
-                <!-- Pengaturan -->
-                <li>
-                    <a href="{{ route('profile.edit') }}"
-                        class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                       {{ request()->routeIs('profile.edit') ? 'bg-blue-50 text-blue-700 font-bold shadow-sm' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium' }}">
-                        <span class="text-lg">⚙️</span>
-                        <span class="sidebar-label">Pengaturan</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </aside>
-
-    <!-- Topbar (Fixed) -->
-    <header
-        class="bg-white shadow flex items-center justify-between px-4 sm:px-8 py-3 fixed top-0 left-0 lg:left-64 right-0 z-30 h-16">
-        <!-- Mobile Menu Button and Page Title -->
-        <div class="flex items-center">
-            <button @click="open = true"
-                class="lg:hidden text-gray-500 hover:text-gray-700 focus:outline-none p-2 rounded-md -ml-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
-                    </path>
-                </svg>
-            </button>
-            <div class="hidden lg:block">
-                @if(isset($header))
-                {{ $header }}
-                @endif
-            </div>
-        </div>
-
-        <div class="flex items-center gap-4">
-            <!-- Notifikasi Icon -->
-            <div x-data="{ open: false }" class="relative hidden sm:block">
-                <button @click="open = !open"
-                    class="relative focus:outline-none p-2 rounded-full hover:bg-gray-100 transition">
-                    <svg class="w-6 h-6 text-gray-500 hover:text-blue-700 transition" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
+    <nav class="flex-1 p-4 overflow-y-auto">
+        <ul class="space-y-2">
+            <li>
+                <a href="{{ route('admin-bidang.dashboard') }}" title="Beranda"
+                    class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition" :class="{
+                       'bg-blue-100 text-blue-700 font-semibold': {{ request()->routeIs('admin-bidang.dashboard') ? 'true' : 'false' }},
+                       'text-gray-600 hover:bg-gray-100': !{{ request()->routeIs('admin-bidang.dashboard') ? 'true' : 'false' }},
+                       'justify-center': sidebarMinimized
+                   }">
+                    <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5" />
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
-                    {{-- Badge notifikasi (contoh) --}}
-                    {{-- <span class="absolute top-1 right-1 inline-block w-2 h-2 bg-red-500 rounded-full"></span> --}}
-                </button>
+                    <span x-show="!sidebarMinimized" class="whitespace-nowrap">Beranda</span>
+                </a>
+            </li>
 
-                {{-- Dropdown Notifikasi (Dummy) --}}
-                <div x-show="open" @click.outside="open = false"
-                    class="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl overflow-hidden z-40 border border-gray-200"
-                    x-transition:enter="transition ease-out duration-100"
-                    x-transition:enter-start="transform opacity-0 scale-95"
-                    x-transition:enter-end="transform opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-75"
-                    x-transition:leave-start="transform opacity-100 scale-100"
-                    x-transition:leave-end="transform opacity-0 scale-95">
-                    <div class="py-2 px-4 font-bold text-sm text-gray-700 border-b">Notifikasi Terbaru</div>
-                    <div class="py-2">
-                        <div class="flex items-center px-4 py-2 text-sm text-gray-700">
-                            <span class="text-blue-500 mr-3">🔔</span>Tidak ada notifikasi baru.
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <li>
+                <a href="{{ route('admin-bidang.konfirmasi-mahasiswa') }}" title="Konfirmasi Mahasiswa"
+                    class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition" :class="{
+                       'bg-blue-100 text-blue-700 font-semibold': {{ request()->routeIs('admin-bidang.konfirmasi-mahasiswa') ? 'true' : 'false' }},
+                       'text-gray-600 hover:bg-gray-100': !{{ request()->routeIs('admin-bidang.konfirmasi-mahasiswa') ? 'true' : 'false' }},
+                       'justify-center': sidebarMinimized
+                   }">
+                    <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z">
+                        </path>
+                    </svg>
+                    <span x-show="!sidebarMinimized" class="whitespace-nowrap">Konfirmasi Mahasiswa</span>
+                </a>
+            </li>
 
-            <!-- User Dropdown (Admin Bidang) -->
-            <x-dropdown align="right" width="48">
-                <x-slot name="trigger">
-                    <button
-                        class="inline-flex items-center gap-2 px-3 py-2 border border-transparent text-sm leading-4 font-semibold rounded-full text-gray-700 bg-white hover:text-blue-700 focus:outline-none transition ease-in-out duration-150 shadow-sm hover:shadow-md">
-                        <!-- User Icon (Avatar Placeholder) -->
-                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
+            <li x-data="{ open: {{ $isMonitoringActive ? 'true' : 'false' }} }" class="relative">
+                <button @click="open = !open" title="Monitoring Laporan"
+                    class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100"
+                    :class="{'justify-center': sidebarMinimized}">
+                    <span class="flex items-center gap-3">
+                        <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                             </path>
                         </svg>
+                        <span x-show="!sidebarMinimized" class="whitespace-nowrap">Monitoring Laporan</span>
+                    </span>
+                    <svg x-show="!sidebarMinimized" :class="{'rotate-180': open}" class="w-5 h-5 transition-transform"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <ul x-show="open && !sidebarMinimized" x-collapse.duration.300ms class="pl-8 space-y-1 mt-1" x-cloak>
+                    <li><a href="{{ route('admin-bidang.monitoring.laporan.mingguan') }}"
+                            class="block px-4 py-2 rounded-lg text-sm {{ request()->routeIs('admin-bidang.monitoring.laporan.mingguan') ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-gray-100' }}">Laporan
+                            Mingguan</a></li>
+                    <li><a href="{{ route('admin-bidang.monitoring.laporan.akhir') }}"
+                            class="block px-4 py-2 rounded-lg text-sm {{ request()->routeIs('admin-bidang.monitoring.laporan.akhir') ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-gray-100' }}">Laporan
+                            Akhir</a></li>
+                </ul>
+                <div x-show="open && sidebarMinimized" @click.away="open = false"
+                    class="absolute left-full top-0 ml-2 w-52 bg-white rounded-md shadow-lg py-1 z-50 border" x-cloak>
+                    <a href="{{ route('admin-bidang.monitoring.laporan.mingguan') }}"
+                        class="block px-4 py-2 text-sm {{ request()->routeIs('admin-bidang.monitoring.laporan.mingguan') ? 'text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-100' }}">Laporan
+                        Mingguan</a>
+                    <a href="{{ route('admin-bidang.monitoring.laporan.akhir') }}"
+                        class="block px-4 py-2 text-sm {{ request()->routeIs('admin-bidang.monitoring.laporan.akhir') ? 'text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-100' }}">Laporan
+                        Akhir</a>
+                </div>
+            </li>
 
-                        <div>{{ Auth::user()->name ?? 'Admin Bidang' }}</div>
-                        <div class="ms-1">
-                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                    </button>
-                </x-slot>
-                <x-slot name="content">
-                    <x-dropdown-link :href="route('profile.edit')">{{ __('Profile') }}</x-dropdown-link>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <x-dropdown-link :href="route('logout')"
-                            onclick="event.preventDefault(); this.closest('form').submit();">{{ __('Log Out') }}
-                        </x-dropdown-link>
-                    </form>
-                </x-slot>
-            </x-dropdown>
-        </div>
-    </header>
-</div>
+            <li>
+                <a href="{{ route('admin-bidang.kuota-bidang') }}" title="Kuota Bidang"
+                    class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition" :class="{
+                       'bg-blue-100 text-blue-700 font-semibold': {{ request()->routeIs('admin-bidang.kuota-bidang') ? 'true' : 'false' }},
+                       'text-gray-600 hover:bg-gray-100': !{{ request()->routeIs('admin-bidang.kuota-bidang') ? 'true' : 'false' }},
+                       'justify-center': sidebarMinimized
+                   }">
+                    <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 10h18M3 14h18m-9-4v8m-7-4h14m-12 4h10m-8 4h6"></path>
+                    </svg>
+                    <span x-show="!sidebarMinimized" class="whitespace-nowrap">Kuota Bidang</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('profile.edit') }}" title="Pengaturan"
+                    class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition" :class="{
+                       'bg-blue-100 text-blue-700 font-semibold': {{ request()->routeIs('profile.edit') ? 'true' : 'false' }},
+                       'text-gray-600 hover:bg-gray-100': !{{ request()->routeIs('profile.edit') ? 'true' : 'false' }},
+                       'justify-center': sidebarMinimized
+                   }">
+                    <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span x-show="!sidebarMinimized" class="whitespace-nowrap">Pengaturan</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>

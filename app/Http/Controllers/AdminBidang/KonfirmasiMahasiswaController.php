@@ -7,8 +7,11 @@ use App\Models\AntrianPKL;
 use App\Models\Bidang;
 use App\Models\Pembimbing;
 use App\Models\PenempatanPKL;
+use App\Models\User;
+use App\Notifications\PesanNotifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 
 class KonfirmasiMahasiswaController extends Controller
 {
@@ -39,38 +42,56 @@ class KonfirmasiMahasiswaController extends Controller
         // Validasi
         $request->validate([
             'action' => 'required|in:terima,tolak',
-            // Nama pembimbing hanya wajib jika aksinya 'terima'
             'nama_pembimbing' => 'nullable|required_if:action,terima|string|max:255',
-            // Alasan penolakan hanya wajib jika aksinya 'tolak'
             'alasan_penolakan' => 'nullable|required_if:action,tolak|string|max:1000',
         ]);
 
+        $penempatan->load('antrian.user', 'bidang');
+
+        // 2. Lakukan pengecekan untuk mencegah error jika relasi tidak ditemukan
+        if (!$penempatan->antrian || !$penempatan->antrian->user) {
+            return redirect()->route('admin-bidang.konfirmasi-mahasiswa')->with('error', 'Data mahasiswa terkait tidak ditemukan.');
+        }
+
+        // 3. Simpan data ke dalam variabel sebelum diproses lebih lanjut
+        $mahasiswa = $penempatan->antrian->user;
+        $bidang = $penempatan->bidang;
+        $antrian = $penempatan->antrian;
+
+        // --- LOGIKA SELANJUTNYA ---
+
         if ($request->action === 'terima') {
-            // Logika cerdas untuk membuat atau menggunakan pembimbing yang sudah ada
+            // Logika untuk membuat atau menggunakan pembimbing yang sudah ada
             $pembimbing = Pembimbing::firstOrCreate(
                 ['nama_pembimbing' => $request->nama_pembimbing]
             );
 
             // Update data penempatan
             $penempatan->update([
-                'status_pkl' => 'Sedang Berjalan', // Status diubah menjadi "Sedang Berjalan"
-                'id_pembimbing' => $pembimbing->id, // Gunakan ID pembimbing yang sudah didapat
+                'status_pkl' => 'Sedang Berjalan',
+                'id_pembimbing' => $pembimbing->id,
             ]);
 
-            $message = 'Mahasiswa ' . $penempatan->antrian->user->name . ' telah diterima dan sedang menjalankan PKL.';
-        } else { // Jika aksinya 'tolak'
-            // 1. Hapus record penempatannya
+            // Kirim notifikasi ke mahasiswa
+            $pesan = "Selamat! Pengajuan PKL Anda di " . $bidang->nama_bidang . " telah diterima. Pembimbing Anda adalah " . $pembimbing->nama_pembimbing . ".";
+            $url = route('mahasiswa.dashboard');
+            $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
+
+            $message = 'Mahasiswa ' . $mahasiswa->name . ' telah diterima dan sedang menjalankan PKL.';
+        } else { // Jika tindakan adalah 'tolak'
+            // Kirim notifikasi penolakan ke admin instansi (data sudah aman di variabel)
+            $adminsInstansi = User::where('role', 'admin_instansi')->get();
+            $pesanAdmin = "Penempatan untuk " . $mahasiswa->name . " di " . $bidang->nama_bidang . " ditolak oleh Admin Bidang. Silakan tempatkan kembali.";
+            $urlAdmin = route('admin-instansi.penempatan.index');
+            Notification::send($adminsInstansi, new PesanNotifikasi($pesanAdmin, $urlAdmin));
+
+            // Hapus data penempatan
             $penempatan->delete();
 
-            // 2. Kembalikan status antrian utama menjadi 'Dokumen Lengkap'
-            // agar muncul lagi di halaman penempatan Admin Instansi
-            $antrian = AntrianPKL::find($penempatan->id_antrian);
+            // Kembalikan status antrian mahasiswa
             if ($antrian) {
                 $antrian->update(['status_antrian' => 'Dokumen Lengkap']);
             }
-
-            // (Opsional) Simpan alasan penolakan jika perlu, misalnya di log atau tabel terpisah.
-            // Untuk saat ini kita langsung kembalikan saja.
 
             $message = 'Mahasiswa telah ditolak dan dikembalikan ke daftar penempatan Admin Instansi.';
         }

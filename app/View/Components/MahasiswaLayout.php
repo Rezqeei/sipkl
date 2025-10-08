@@ -4,6 +4,7 @@ namespace App\View\Components;
 
 use Closure;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Component;
 
 class MahasiswaLayout extends Component
@@ -21,6 +22,12 @@ class MahasiswaLayout extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.mahasiswa-layout');
+        $user = Auth::user();
+        $notifications = $user ? $user->notifications()->latest()->take(5)->get() : collect();
+        $unreadNotificationsCount = $user ? $user->unreadNotifications()->count() : 0;
+        return view('components.mahasiswa-layout', [
+            'notifications' => $notifications,
+            'unreadNotificationsCount' => $unreadNotificationsCount,
+        ]);
     }
 }

@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Mahasiswa;
 use App\Http\Controllers\Controller;
 use App\Models\AntrianPKL;
 use App\Models\DokumenPKL;
+use App\Models\User;
+use App\Notifications\PesanNotifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 
 class PengajuanPKLController extends Controller
 {
@@ -51,6 +54,13 @@ class PengajuanPKLController extends Controller
             'jumlah_orang' => $validated['jumlah_orang'],
             'status_antrian' => 'Menunggu Verifikasi', // Status awal
         ]);
+
+        $adminsInstansi = User::where('role', 'admin_instansi')->get();
+        $pesan = "Pengajuan PKL baru dari " . $validated['nama_lengkap'] . " perlu diverifikasi.";
+        $url = route('admin-instansi.verifikasi-pengajuan.index');
+
+        // Menggunakan fasad Notification untuk mengirim ke banyak user
+        Notification::send($adminsInstansi, new PesanNotifikasi($pesan, $url));
 
         return redirect()->route('mahasiswa.dashboard')->with('success', 'Pengajuan Antrian PKL berhasil dikirim dan sedang menunggu verifikasi.');
     }

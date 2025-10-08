@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Mahasiswa;
 use App\Http\Controllers\Controller;
 use App\Models\AntrianPKL;
 use App\Models\DokumenPKL;
+use App\Models\User;
+use App\Notifications\PesanNotifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 class DokumenController extends Controller
@@ -89,6 +92,11 @@ class DokumenController extends Controller
 
         // Ubah status antrian utama kembali ke 'Menunggu Verifikasi Dokumen'
         $antrian->update(['status_antrian' => 'Menunggu Verifikasi Dokumen']);
+        $adminsInstansi = User::where('role', 'admin_instansi')->get();
+        $pesan = "Dokumen dari " . $antrian->nama_lengkap . " telah diunggah dan perlu diverifikasi.";
+        $url = route('admin-instansi.verifikasi-dokumen.index');
+
+        Notification::send($adminsInstansi, new PesanNotifikasi($pesan, $url));
 
         return redirect()->route('mahasiswa.dashboard')->with('success', 'Dokumen berhasil diunggah dan sedang menunggu verifikasi.');
     }

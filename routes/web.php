@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ProfileController;
@@ -36,7 +37,7 @@ use Illuminate\Support\Facades\Auth;
 
 // --- RUTE PUBLIK & GLOBAL ---
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 Route::get('/dashboard', function () {
@@ -55,6 +56,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/notifications/{notificationId}/read', [NotificationController::class, 'read'])->name('notifications.read');
 });
 
 
@@ -109,7 +111,7 @@ Route::middleware(['auth', 'role:admin_instansi'])
 
 
         Route::get('/arsip-pkl', [ArsipPKLController::class, 'index'])->name('arsip-pkl.index');
-         Route::post('/arsip-pkl/{arsip}/store-sk', [ArsipPKLController::class, 'storeSk'])->name('arsip-pkl.store-sk');
+        Route::post('/arsip-pkl/{arsip}/store-sk', [ArsipPKLController::class, 'storeSk'])->name('arsip-pkl.store-sk');
 
         Route::get('/manajemen-bidang', [ManajemenBidangController::class, 'index'])->name('manajemen-bidang.index');
         Route::post('/manajemen-bidang', [ManajemenBidangController::class, 'store'])->name('manajemen-bidang.store');
@@ -124,7 +126,7 @@ Route::middleware(['auth', 'role:admin_bidang'])
         Route::get('/dashboard', [AdminBidangDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/konfirmasi-mahasiswa', [KonfirmasiMahasiswaController::class, 'index'])->name('konfirmasi-mahasiswa');
-        Route::put('/konfirmasi-mahasiswa/{id}', [KonfirmasiMahasiswaController::class, 'konfirmasi'])->name('konfirmasi-mahasiswa.konfirmasi');
+        Route::put('/konfirmasi-mahasiswa/{penempatan}', [KonfirmasiMahasiswaController::class, 'prosesKonfirmasi'])->name('konfirmasi-mahasiswa.konfirmasi');
         Route::delete('/konfirmasi-mahasiswa/{id}', [KonfirmasiMahasiswaController::class, 'destroy'])->name('konfirmasi-mahasiswa.destroy');
 
         Route::get('/monitoring-laporan/mingguan', [MonitoringLaporanController::class, 'showMingguan'])->name('monitoring.laporan.mingguan');

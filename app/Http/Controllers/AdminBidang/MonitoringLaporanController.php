@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\LaporanAkhir;
 use App\Models\LaporanMingguan;
 use App\Models\PenempatanPKL;
+use App\Notifications\PesanNotifikasi;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,8 +43,6 @@ class MonitoringLaporanController extends Controller
         $request->validate(['status_verifikasi' => 'required|in:Disetujui,Ditolak']);
         $laporan = LaporanMingguan::findOrFail($id_laporan);
 
-        // --- PERBAIKAN KONDISI OTORISASI ---
-        // Membandingkan ID bidang dari laporan dengan ID bidang yang dikelola admin.
         if ($laporan->penempatan->id_bidang !== (Auth::user()->bidangDikelola->id ?? null)) {
             return redirect()->back()->with('error', 'Akses ditolak.');
         }
@@ -105,6 +104,16 @@ class MonitoringLaporanController extends Controller
         if ($request->status_verifikasi === 'Disetujui') {
             $laporan->penempatan->update(['status_pkl' => 'Selesai']);
         }
+        $mahasiswa = $laporan->penempatan->antrian->user;
+        $status = strtolower($request->action);
+        $pesan = "Laporan akhir Anda telah diverifikasi dengan status: {$status}.";
+        if ($request->action == 'Revisi') {
+            $pesan .= " Catatan: " . $request->feedback;
+        } elseif ($request->action == 'Diterima') {
+            $pesan .= " Selamat, Anda telah menyelesaikan PKL! Silakan download Surat Keterangan Selesai.";
+        }
+        $url = route('mahasiswa.laporan.akhir');
+        $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
 
         return redirect()->back()->with('success', 'Status laporan akhir berhasil diperbarui.');
     }

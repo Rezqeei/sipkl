@@ -32,7 +32,7 @@ class VerifikasiPengajuanController extends Controller
             // Alasan wajib diisi jika aksinya adalah 'tolak'
             'alasan_penolakan' => 'nullable|string|max:500|required_if:action,tolak',
         ]);
-
+        $mahasiswa = $antrian->user;
         // 2. Lakukan aksi berdasarkan input 'action'
         if ($request->action === 'terima') {
             $antrian->update([
@@ -41,15 +41,18 @@ class VerifikasiPengajuanController extends Controller
             ]);
             $message = 'Pengajuan untuk ' . $antrian->user->name . ' telah DITERIMA.';
 
-            $pesan = "Selamat! Pengajuan PKL Anda telah diterima.";
-            $url = route('mahasiswa.dashboard');
-            $antrian->user->notify(new PesanNotifikasi($pesan, $url));
+            $pesan = "Selamat! Pengajuan PKL Anda telah diterima. Silakan segera unggah dokumen yang diperlukan.";
+            $url = route('mahasiswa.unggah.dokumen');
+            $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
         } else { // Jika aksinya 'tolak'
             $antrian->update([
                 'status_antrian' => 'Ditolak',
                 'alasan_penolakan' => $request->alasan_penolakan,
             ]);
             $message = 'Pengajuan untuk ' . $antrian->user->name . ' telah DITOLAK.';
+            $pesan = "Maaf, pengajuan PKL Anda ditolak. Alasan: " . $request->alasan_penolakan;
+            $url = route('mahasiswa.dashboard');
+            $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
         }
         return redirect()->route('admin-instansi.verifikasi-pengajuan.index')->with('success', $message);
     }

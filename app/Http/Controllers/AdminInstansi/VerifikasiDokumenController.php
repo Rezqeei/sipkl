@@ -5,6 +5,7 @@ namespace App\Http\Controllers\AdminInstansi;
 use App\Http\Controllers\Controller;
 use App\Models\AntrianPKL;
 use App\Models\DokumenPKL;
+use App\Notifications\PesanNotifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -33,6 +34,7 @@ class VerifikasiDokumenController extends Controller
 
         // Ambil data antrian yang terhubung dengan dokumen ini
         $antrian = $dokumen->antrian;
+        $mahasiswa = $antrian->user;
 
         if ($request->action === 'terima') {
             // Update tabel dokumen
@@ -43,6 +45,10 @@ class VerifikasiDokumenController extends Controller
             // Update tabel antrian
             $antrian->update(['status_antrian' => 'Dokumen Lengkap']);
             $message = 'Dokumen untuk ' . $antrian->user->name . ' telah disetujui.';
+
+            $pesan = "Kabar baik! Dokumen Anda telah diverifikasi dan dinyatakan lengkap. Tunggu penempatan dari admin.";
+            $url = route('mahasiswa.dashboard');
+            $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
         } else { // Jika revisi
             // Update tabel dokumen
             $dokumen->update([
@@ -52,6 +58,10 @@ class VerifikasiDokumenController extends Controller
             // Update tabel antrian
             $antrian->update(['status_antrian' => 'Revisi Dokumen']);
             $message = 'Dokumen untuk ' . $antrian->user->name . ' ditandai untuk revisi.';
+
+            $pesan = "Dokumen Anda perlu direvisi. Silakan periksa catatan dan unggah kembali. Catatan: " . $request->catatan_revisi;
+            $url = route('mahasiswa.unggah.dokumen');
+            $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
         }
 
         return redirect()->route('admin-instansi.verifikasi-dokumen.index')->with('success', $message);

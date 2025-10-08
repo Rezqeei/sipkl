@@ -7,6 +7,8 @@ use App\Models\AntrianPKL;
 use App\Models\Bidang;
 use App\Models\Pembimbing;
 use App\Models\PenempatanPKL;
+use App\Models\User;
+use App\Notifications\PesanNotifikasi;
 use Illuminate\Http\Request;
 
 class PenempatanController extends Controller
@@ -38,16 +40,7 @@ class PenempatanController extends Controller
 
         $antrian = AntrianPKL::find($request->antrian_id);
         $bidang = Bidang::find($request->id_bidang);
-        // $pembimbing = Pembimbing::firstOrCreate(
-        //     ['nama_pembimbing' => $request->nama_pembimbing]
-        // );
 
-        // 2. Cek apakah kuota bidang masih tersedia
-        // if ($bidang->sisa_kuota < $antrian->jumlah_orang) {
-        //     return redirect()->back()->with('error', 'Kuota untuk bidang ' . $bidang->nama_bidang . ' tidak mencukupi.');
-        // }
-
-        // 3. Buat record baru di tabel penempatan
         PenempatanPKL::updateOrCreate([
             'id_antrian' => $antrian->id_antrian,
             'id_pengguna' => $antrian->id_pengguna,
@@ -56,11 +49,13 @@ class PenempatanController extends Controller
             'status_pkl' => 'Menunggu Konfirmasi Admin Bidang',
         ]);
 
-        // 4. Update status antrian utama menjadi selesai
         $antrian->update(['status_antrian' => 'Ditempatkan']);
-
-        // 5. Kurangi sisa kuota di bidang terkait
-        // $bidang->decrement('sisa_kuota', $antrian->jumlah_orang);
+        $adminBidang = User::find($bidang->id_admin_bidang);
+        if ($adminBidang) {
+            $pesan = "Mahasiswa baru (" . $antrian->user->name . ") telah ditempatkan di bidang Anda dan menunggu konfirmasi.";
+            $url = route('admin-bidang.konfirmasi-mahasiswa');
+            $adminBidang->notify(new PesanNotifikasi($pesan, $url));
+        }
 
         return redirect()->route('admin-instansi.penempatan.index')->with('success', $antrian->user->name . ' berhasil dikirim di Bidang ' . $bidang->nama_bidang . 'untuk konfirmasi');
     }
