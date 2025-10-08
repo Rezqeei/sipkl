@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PenempatanPKL;
 use App\Models\SuratKeterangan;
+use App\Notifications\PesanNotifikasi;
 
 class ArsipPKLController extends Controller
 {
@@ -37,7 +38,12 @@ class ArsipPKLController extends Controller
                 'file_surat' => $filePath,
             ]
         );
-
+        $mahasiswa = $arsip->antrian->user;
+        if ($mahasiswa) {
+            $pesan = "Surat Keterangan Selesai PKL Anda telah terbit dan dapat diunduh.";
+            $url = route('mahasiswa.download.sk');
+            $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
+        }
         return redirect()->back()->with('success', 'Surat Keterangan berhasil diunggah untuk ' . $arsip->antrian->user->name);
     }
 }

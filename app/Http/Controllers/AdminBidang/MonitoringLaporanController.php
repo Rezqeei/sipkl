@@ -46,8 +46,14 @@ class MonitoringLaporanController extends Controller
         if ($laporan->penempatan->id_bidang !== (Auth::user()->bidangDikelola->id ?? null)) {
             return redirect()->back()->with('error', 'Akses ditolak.');
         }
-
         $laporan->update(['status_verifikasi' => $request->status_verifikasi]);
+        $mahasiswa = $laporan->penempatan->mahasiswa;
+         if ($mahasiswa) {
+            $status = $request->status_verifikasi;
+            $pesan = "Laporan mingguan Anda (Minggu ke-{$laporan->minggu_ke}) telah diverifikasi dengan status: {$status}.";
+            $url = route('mahasiswa.laporan.mingguan');
+            $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
+        }
         return redirect()->back()->with('success', 'Status laporan berhasil diperbarui.');
     }
 
