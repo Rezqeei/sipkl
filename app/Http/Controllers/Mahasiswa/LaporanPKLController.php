@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\LaporanAkhir;
 use App\Models\LaporanMingguan;
 use App\Models\PenempatanPKL;
+use App\Models\User;
+use App\Notifications\PesanNotifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -49,6 +51,13 @@ class LaporanPKLController extends Controller
             'file_laporan' => $path,
             'status_verifikasi' => 'Menunggu Verifikasi', // Status awal
         ]);
+
+        $adminBidang = User::find($penempatan->bidang->id_admin_bidang);
+        if ($adminBidang) {
+            $pesan = "Laporan mingguan baru dari " . Auth::user()->name;
+            $url = route('admin-bidang.monitoring.laporan.mingguan');
+            $adminBidang->notify(new PesanNotifikasi($pesan, $url));
+        }
 
         return redirect()->back()->with('success', 'Laporan mingguan berhasil diunggah.');
     }

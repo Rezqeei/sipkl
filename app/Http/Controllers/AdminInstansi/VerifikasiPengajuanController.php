@@ -5,6 +5,7 @@ namespace App\Http\Controllers\AdminInstansi;
 use App\Http\Controllers\Controller;
 use App\Models\AntrianPKL;
 use App\Models\DokumenPKL;
+use App\Notifications\PesanNotifikasi;
 use Illuminate\Http\Request;
 
 class VerifikasiPengajuanController extends Controller
@@ -23,7 +24,7 @@ class VerifikasiPengajuanController extends Controller
     /**
      * Memproses keputusan verifikasi (Terima atau Tolak).
      */
-    public function update(Request $request, AntrianPkl $antrian) 
+    public function update(Request $request, AntrianPkl $antrian)
     {
         // 1. Validasi input dari form admin
         $request->validate([
@@ -39,6 +40,10 @@ class VerifikasiPengajuanController extends Controller
                 'alasan_penolakan' => null, // Pastikan alasan kosong jika diterima
             ]);
             $message = 'Pengajuan untuk ' . $antrian->user->name . ' telah DITERIMA.';
+
+            $pesan = "Selamat! Pengajuan PKL Anda telah diterima.";
+            $url = route('mahasiswa.dashboard');
+            $antrian->user->notify(new PesanNotifikasi($pesan, $url));
         } else { // Jika aksinya 'tolak'
             $antrian->update([
                 'status_antrian' => 'Ditolak',
