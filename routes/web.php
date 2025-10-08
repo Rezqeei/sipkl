@@ -109,6 +109,7 @@ Route::middleware(['auth', 'role:admin_instansi'])
 
 
         Route::get('/arsip-pkl', [ArsipPKLController::class, 'index'])->name('arsip-pkl.index');
+         Route::post('/arsip-pkl/{arsip}/store-sk', [ArsipPKLController::class, 'storeSk'])->name('arsip-pkl.store-sk');
 
         Route::get('/manajemen-bidang', [ManajemenBidangController::class, 'index'])->name('manajemen-bidang.index');
         Route::post('/manajemen-bidang', [ManajemenBidangController::class, 'store'])->name('manajemen-bidang.store');

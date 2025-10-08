@@ -23,23 +23,16 @@ class SKController extends Controller
      */
     public function download(SuratKeterangan $surat)
     {
-        // 1. Otorisasi: pastikan surat ini milik user yang meminta
         $penempatan = PenempatanPkl::find($surat->id_penempatan);
         if ($penempatan->id_pengguna !== Auth::id()) {
             abort(403, 'Akses Ditolak');
         }
 
-        // 2. Cek apakah file benar-benar ada di dalam 'storage/app/public'
-        if (!Storage::disk('public')->exists($surat->file_path)) {
+        if (!Storage::disk('public')->exists($surat->file_surat)) {
             return redirect()->back()->with('error', 'File Surat Keterangan tidak dapat ditemukan.');
         }
-
-        // ===================================================================
-        // INI PERBAIKANNYA
-        // ===================================================================
-
         // 3. Ambil path lengkap file dari "Gudang"
-        $pathLengkap = Storage::disk('public')->path($surat->file_path);
+        $pathLengkap = Storage::disk('public')->path($surat->file_surat);
 
         // 4. Suruh "Kurir" (response helper) untuk mengirim file dari path tersebut
         return response()->download($pathLengkap);
