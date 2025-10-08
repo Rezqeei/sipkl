@@ -27,7 +27,9 @@ class MonitoringLaporanController extends Controller
         })->with([
             'penempatan.mahasiswa',
             'penempatan.antrian'
-        ])->orderBy('created_at', 'desc')->get();
+        ])
+            ->where('status_verifikasi', 'Menunggu Verifikasi')
+            ->orderBy('created_at', 'desc')->get();
 
         return view('admin-bidang.laporan-mingguan', compact('laporans'));
     }
@@ -58,18 +60,18 @@ class MonitoringLaporanController extends Controller
         $id_bidang = Auth::user()->bidangDikelola->id ?? null;
 
         if (!$id_bidang) {
-            $laporans = collect();
-            return view('admin-bidang.laporan-akhir', compact('laporans'));
+            $laporanAkhir = collect();
+        } else {
+            $laporanAkhir = LaporanAkhir::with(['penempatan.antrian.user'])
+                ->whereHas('penempatan', function ($query) use ($id_bidang) {
+                    $query->where('id_bidang', $id_bidang);
+                })
+                ->where('status_verifikasi', 'Menunggu Verifikasi')
+                ->orderBy('created_at', 'desc')
+                ->get();
         }
 
-        $laporans = LaporanAkhir::with(['penempatan.antrian.user'])
-            ->whereHas('penempatan', function ($query) use ($id_bidang) {
-                $query->where('id_bidang', $id_bidang);
-            })
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return view('admin-bidang.laporan-akhir', ['laporans' => collect()]);
+        return view('admin-bidang.laporan-akhir', compact('laporanAkhir'));
     }
 
     /**
@@ -79,18 +81,27 @@ class MonitoringLaporanController extends Controller
     {
         $request->validate([
             'status_verifikasi' => 'required|in:Disetujui,Ditolak',
+            // 'feedback' hanya wajib diisi jika statusnya 'Ditolak'
+            'feedback' => 'nullable|string|required_if:status_verifikasi,Ditolak',
+        ], [
+            // Pesan error kustom agar lebih jelas
+            'feedback.required_if' => 'Alasan penolakan wajib diisi jika laporan ditolak.'
         ]);
 
         $laporan = LaporanAkhir::findOrFail($id);
 
+        // 2. Otorisasi untuk memastikan admin hanya bisa memverifikasi laporan di bidangnya
         if ($laporan->penempatan->id_bidang !== (Auth::user()->bidangDikelola->id ?? null)) {
             return redirect()->back()->with('error', 'Anda tidak berwenang melakukan aksi ini.');
         }
 
+        // 3. Update data laporan berdasarkan input dari form
         $laporan->status_verifikasi = $request->status_verifikasi;
+        // Jika disetujui, feedback dikosongkan. Jika ditolak, feedback diisi.
+        $laporan->feedback = $request->status_verifikasi === 'Ditolak' ? $request->feedback : null;
         $laporan->save();
 
-        // Jika laporan akhir disetujui, ubah status PKL mahasiswa menjadi 'Selesai'
+        // 4. Jika laporan disetujui, otomatis ubah status PKL mahasiswa menjadi 'Selesai'
         if ($request->status_verifikasi === 'Disetujui') {
             $laporan->penempatan->update(['status_pkl' => 'Selesai']);
         }

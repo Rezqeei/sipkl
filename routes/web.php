@@ -130,11 +130,11 @@ Route::middleware(['auth', 'role:admin_bidang'])
         Route::post('/monitoring-laporan/mingguan/{id}/verify', [MonitoringLaporanController::class, 'verifyMingguan'])->name('monitoring.laporan.mingguan.verify');
         Route::get('/monitoring-laporan/mingguan/{id}/download', [MonitoringLaporanController::class, 'downloadMingguan'])->name('monitoring.laporan.mingguan.download');
 
-        Route::get('/monitoring-laporan/akhir', [MonitoringLaporanController::class, 'akhir'])->name('laporan-akhir');
-        Route::get('/monitoring-laporan/{id}/download', [MonitoringLaporanController::class, 'download'])->name('monitoring-laporan.download');
+        // Route::get('/monitoring-laporan/akhir', [MonitoringLaporanController::class, 'akhir'])->name('laporan-akhir');
+        // Route::get('/monitoring-laporan/{id}/download', [MonitoringLaporanController::class, 'download'])->name('monitoring-laporan.download');
 
         Route::get('/monitoring-laporan/akhir', [MonitoringLaporanController::class, 'showAkhir'])->name('monitoring.laporan.akhir');
-        Route::post('/monitoring-laporan/akhir/{id}/verify', [MonitoringLaporanController::class, 'verifyAkhir'])->name('monitoring.laporan.akhir.verify');
+        Route::patch('/monitoring-laporan/akhir/{id}/verify', [MonitoringLaporanController::class, 'verifyAkhir'])->name('monitoring.laporan.akhir.verify');
         Route::get('/monitoring-laporan/akhir/{id}/download', [MonitoringLaporanController::class, 'downloadAkhir'])->name('monitoring.laporan.akhir.download');
 
         Route::get('/kuota-bidang', [KuotaBidangController::class, 'index'])->name('kuota-bidang');
