@@ -2,8 +2,9 @@
 
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use App\Http\Controllers\ProfileController;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 // Controller untuk Mahasiswa
 use App\Http\Controllers\Mahasiswa\DashboardMahasiswaController;
@@ -26,12 +27,15 @@ use App\Http\Controllers\AdminBidang\KonfirmasiMahasiswaController;
 use App\Http\Controllers\AdminBidang\MonitoringLaporanController;
 use App\Http\Controllers\AdminBidang\KuotaBidangController;
 use App\Http\Controllers\AdminInstansi\ManajemenBidangController;
-use App\Http\Controllers\DokumenController as ControllersDokumenController;
-use Illuminate\Support\Facades\Auth;
+
 
 
 Route::get('/', function () {
-    return view('auth.login');
+    $mahasiswaAktifCount = User::whereHas('antrian.penempatan', function ($query) {
+        $query->where('status_pkl', 'Sedang Berjalan');
+    })->count();
+
+    return view('welcome', compact('mahasiswaAktifCount'));
 });
 
 Route::get('/dashboard', function () {
