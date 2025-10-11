@@ -7,14 +7,11 @@ use App\Models\Bidang;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule; // <-- Import Rule
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 
 class ManajemenAdminBidangController extends Controller
 {
-    /**
-     * Menampilkan daftar semua admin bidang.
-     */
     public function index()
     {
         $adminBidangList = User::where('role', 'admin_bidang')->with('bidangDikelola')->latest()->get();
@@ -22,18 +19,11 @@ class ManajemenAdminBidangController extends Controller
         $allBidangsForModal = Bidang::orderBy('nama_bidang')->get();
         return view('admin-instansi.manajemen-admin-bidang', compact('adminBidangList', 'bidangs', 'allBidangsForModal'));
     }
-
-    /**
-     * Menampilkan form untuk membuat admin bidang baru.
-     */
     public function create()
     {
         return view('admin-instansi.manajemen-admin-bidang.create');
     }
 
-    /**
-     * Menyimpan admin bidang baru ke database.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -63,28 +53,18 @@ class ManajemenAdminBidangController extends Controller
             $bidangToUpdate->save();
         }
 
-        // Pastikan nama rute di web.php konsisten (menggunakan strip/hyphen)
         return redirect()->route('admin-instansi.manajemen-admin-bidang.index')->with('success', 'Admin Bidang baru berhasil ditambahkan.');
     }
-
-    /**
-     * Menampilkan form untuk mengedit admin bidang.
-     * Menggunakan nama variabel yang lebih ringkas: $admin
-     */
     public function edit(User $admin)
     {
         return view('admin-instansi.manajemen-admin-bidang.edit', compact('admin'));
     }
 
-    /**
-     * Mengupdate data admin bidang di database.
-     */
     public function update(Request $request, User $manajemen_admin_bidang)
     {
         $admin = $manajemen_admin_bidang;
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            // Menggunakan sintaks validasi 'unique' yang lebih modern
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users')->ignore($admin->id)],
             'status_aktif' => ['required', 'boolean'],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
@@ -99,7 +79,7 @@ class ManajemenAdminBidangController extends Controller
         }
 
         $data = $request->only('name', 'email', 'status_aktif');
-        if ($request->filled('password')) { // Gunakan filled() untuk mengecek input tidak kosong
+        if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }
 
@@ -114,15 +94,10 @@ class ManajemenAdminBidangController extends Controller
 
         return redirect()->route('admin-instansi.manajemen-admin-bidang.index')->with('success', 'Data Admin Bidang berhasil diperbarui.');
     }
-
-    /**
-     * Menonaktifkan akun admin bidang (Soft Delete).
-     */
     public function destroy(User $manajemen_admin_bidang)
     {
-        $admin = $manajemen_admin_bidang; // Alias
+        $admin = $manajemen_admin_bidang;
 
-        // Lepaskan asosiasi bidang sebelum menghapus
         if ($admin->bidangDikelola) {
             $admin->bidangDikelola->update(['id_admin_bidang' => null]);
         }

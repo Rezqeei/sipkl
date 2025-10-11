@@ -39,7 +39,6 @@
                     @endif
 
                     @if($bidang)
-                    <!-- Informasi Kuota -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div class="bg-gray-50 p-6 rounded-lg shadow">
                             <h3 class="font-semibold text-lg mb-2">Informasi Bidang</h3>
@@ -53,10 +52,8 @@
                         </div>
                     </div>
 
-                    <!-- Form Update Kuota -->
                     <div class="mb-6">
                         <h3 class="font-semibold text-lg mb-2">Update Kuota</h3>
-                        {{-- PERBAIKAN: Mengganti nama route yang salah --}}
                         <form action="{{ route('admin-bidang.kuota-bidang.update') }}" method="POST">
                             @csrf
                             @method('PUT')
@@ -70,7 +67,6 @@
                         </form>
                     </div>
 
-                    <!-- Daftar Mahasiswa Aktif -->
                     <div>
                         <h3 class="font-semibold text-lg mb-4">Daftar Mahasiswa PKL Aktif</h3>
                         <div class="overflow-x-auto">

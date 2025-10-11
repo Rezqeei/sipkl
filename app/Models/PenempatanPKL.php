@@ -28,7 +28,6 @@ class PenempatanPKL extends Model
 
     public function mahasiswa()
     {
-        // hasOneThrough: Satu Penempatan punya satu User MELALUI AntrianPKL
         return $this->hasOneThrough(
             User::class,            
             AntrianPKL::class,      

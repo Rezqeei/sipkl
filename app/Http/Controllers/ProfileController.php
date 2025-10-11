@@ -11,13 +11,10 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
     public function edit(Request $request): View
     {
         $user = $request->user();
-        
+
         $layout = 'mahasiswa-layout';
 
         if ($user->role === 'admin_instansi') {
@@ -25,15 +22,12 @@ class ProfileController extends Controller
         } elseif ($user->role === 'admin_bidang') {
             $layout = 'admin-bidang-layout';
         }
-    
+
         return view('profile.edit', [
             'user' => $user,
             'layout' => $layout,
         ]);
     }
-    /**
-     * Update the user's profile information.
-     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
@@ -46,10 +40,6 @@ class ProfileController extends Controller
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
-
-    /**
-     * Delete the user's account.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [

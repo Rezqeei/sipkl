@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Mahasiswa;
 
 use App\Http\Controllers\Controller;
 use App\Models\AntrianPKL;
-use App\Models\DokumenPKL;
 use App\Models\User;
 use App\Notifications\PesanNotifikasi;
 use Illuminate\Http\Request;
@@ -15,22 +14,18 @@ class PengajuanPKLController extends Controller
 {
     public function create()
         {
-            // Cek apakah mahasiswa sudah punya pengajuan aktif untuk mencegah duplikasi
             $pengajuanAktif = AntrianPkl::where('id_pengguna', Auth::id())
                                     ->whereIn('status_antrian', ['Menunggu Verifikasi', 'Diterima', 'Menunggu Verifikasi Dokumen', 'Dokumen Lengkap'])
                                     ->exists();
 
             if ($pengajuanAktif) {
-                // Jika sudah ada, arahkan ke dashboard dengan pesan error
                 return redirect()->route('mahasiswa.dashboard')->with('error', 'Anda sudah memiliki pengajuan PKL yang sedang diproses!');
             }
 
-            // Jika belum ada, tampilkan form
             return view('mahasiswa.pengajuan-antrian');
         }
      public function store(Request $request)
     {
-        // 1. Validasi semua input dari form
         $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:255',
             'nim' => 'required|string|max:20|unique:antrian_pkl,nim',
@@ -52,14 +47,13 @@ class PengajuanPKLController extends Controller
             'tgl_mulai' => $validated['tgl_mulai'],
             'tgl_berakhir' => $validated['tgl_berakhir'],
             'jumlah_orang' => $validated['jumlah_orang'],
-            'status_antrian' => 'Menunggu Verifikasi', // Status awal
+            'status_antrian' => 'Menunggu Verifikasi', 
         ]);
 
         $adminsInstansi = User::where('role', 'admin_instansi')->get();
         $pesan = "Pengajuan PKL baru dari " . $validated['nama_lengkap'] . " perlu diverifikasi.";
         $url = route('admin-instansi.verifikasi-pengajuan.index');
 
-        // Menggunakan fasad Notification untuk mengirim ke banyak user
         Notification::send($adminsInstansi, new PesanNotifikasi($pesan, $url));
 
         return redirect()->route('mahasiswa.dashboard')->with('success', 'Pengajuan Antrian PKL berhasil dikirim dan sedang menunggu verifikasi.');

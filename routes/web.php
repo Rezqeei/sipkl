@@ -29,13 +29,7 @@ use App\Http\Controllers\AdminInstansi\ManajemenBidangController;
 use App\Http\Controllers\DokumenController as ControllersDokumenController;
 use Illuminate\Support\Facades\Auth;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
 
-// --- RUTE PUBLIK & GLOBAL ---
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -59,10 +53,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications/{notificationId}/read', [NotificationController::class, 'read'])->name('notifications.read');
 });
 
-
-// ===================================================================
-// GRUP RUTE UNTUK MAHASISWA
-// ===================================================================
 Route::middleware(['auth', 'role:mahasiswa'])
     ->prefix('mahasiswa')
     ->name('mahasiswa.')
@@ -101,14 +91,12 @@ Route::middleware(['auth', 'role:admin_instansi'])
         Route::post('/verifikasi-dokumen/{dokumen}', [VerifikasiDokumenController::class, 'update'])->name('verifikasi-dokumen.update');
         Route::get('/verifikasi-dokumen/{dokumen}/download/{tipe}', [VerifikasiDokumenController::class, 'download'])->name('verifikasi-dokumen.download');
 
-
         Route::get('/penempatan-mahasiswa', [PenempatanController::class, 'index'])->name('penempatan.index');
         Route::post('/penempatan-mahasiswa', [PenempatanController::class, 'store'])->name('penempatan.store');
 
         Route::get('/manajemen-admin-bidang', [ManajemenAdminBidangController::class, 'index'])->name('manajemen-admin-bidang.index');
         Route::resource('/manajemen-admin-bidang', ManajemenAdminBidangController::class)->except(['index']);
         Route::resource('/manajemen-bidang', ManajemenBidangController::class)->except(['index', 'show', 'create', 'edit']);
-
 
         Route::get('/arsip-pkl', [ArsipPKLController::class, 'index'])->name('arsip-pkl.index');
         Route::post('/arsip-pkl/{arsip}/store-sk', [ArsipPKLController::class, 'storeSk'])->name('arsip-pkl.store-sk');
@@ -132,9 +120,6 @@ Route::middleware(['auth', 'role:admin_bidang'])
         Route::get('/monitoring-laporan/mingguan', [MonitoringLaporanController::class, 'showMingguan'])->name('monitoring.laporan.mingguan');
         Route::post('/monitoring-laporan/mingguan/{id}/verify', [MonitoringLaporanController::class, 'verifyMingguan'])->name('monitoring.laporan.mingguan.verify');
         Route::get('/monitoring-laporan/mingguan/{id}/download', [MonitoringLaporanController::class, 'downloadMingguan'])->name('monitoring.laporan.mingguan.download');
-
-        // Route::get('/monitoring-laporan/akhir', [MonitoringLaporanController::class, 'akhir'])->name('laporan-akhir');
-        // Route::get('/monitoring-laporan/{id}/download', [MonitoringLaporanController::class, 'download'])->name('monitoring-laporan.download');
 
         Route::get('/monitoring-laporan/akhir', [MonitoringLaporanController::class, 'showAkhir'])->name('monitoring.laporan.akhir');
         Route::patch('/monitoring-laporan/akhir/{id}/verify', [MonitoringLaporanController::class, 'verifyAkhir'])->name('monitoring.laporan.akhir.verify');

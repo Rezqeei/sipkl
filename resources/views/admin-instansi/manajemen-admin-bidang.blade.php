@@ -1,5 +1,4 @@
 <x-admin-layout>
-    <!-- Slot Header -->
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Manajemen Admin & Bidang') }}
@@ -8,8 +7,6 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-
-            <!-- Notifikasi -->
             @if (session('success'))
             <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 5000)"
                 class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
@@ -54,7 +51,6 @@
             </div>
             @endif
 
-            <!-- Card 1: Manajemen Bidang -->
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <div class="max-w-full">
                     <header class="mb-6">
@@ -66,7 +62,6 @@
                         </p>
                     </header>
 
-                    <!-- Form Tambah Bidang -->
                     <form method="POST" action="{{ route('admin-instansi.manajemen-bidang.store') }}" class="mb-6">
                         @csrf
                         <div class="flex items-end gap-4">
@@ -82,7 +77,6 @@
                         </div>
                     </form>
 
-                    <!-- Tabel Daftar Bidang -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -110,14 +104,11 @@
                                         {{ $bidang->adminBidang->name ?? 'Belum ada' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                        <!-- Tombol Edit -->
                                         <button @click="isEdit = true"
                                             class="text-indigo-600 hover:text-indigo-900">Edit</button>
-                                        <!-- Tombol Hapus -->
                                         <button @click="isDelete = true"
                                             class="text-red-600 hover:text-red-900">Hapus</button>
 
-                                        <!-- Modal Edit Bidang -->
                                         <div x-show="isEdit"
                                             class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50"
                                             x-cloak>
@@ -145,7 +136,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- Modal Hapus Bidang -->
                                         <div x-show="isDelete"
                                             class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50"
                                             x-cloak>
@@ -188,7 +178,6 @@
                 </div>
             </div>
 
-            <!-- Card 2: Manajemen Akun Admin Bidang -->
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <div class="max-w-full"
                     x-data="{ isAddAdmin: false, isEditAdmin: false, isDeleteAdmin: false, selectedAdmin: null, selectedBidangId: '' }">
@@ -210,7 +199,6 @@
                         </x-primary-button>
                     </header>
 
-                    <!-- Tabel Akun Admin Bidang -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -262,11 +250,9 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                        <!-- Tombol Edit Akun -->
                                         <button
                                             @click="isEditAdmin = true; selectedAdmin = {{ json_encode($admin) }}; selectedBidangId = '{{ $admin->bidangDikelola->id ?? '' }}'"
                                             class="text-indigo-600 hover:text-indigo-900">Edit</button>
-                                        <!-- Tombol Hapus Akun -->
                                         <button @click="isDeleteAdmin = true; selectedAdmin = {{ json_encode($admin) }}"
                                             class="text-red-600 hover:text-red-900">Hapus</button>
                                     </td>
@@ -282,7 +268,6 @@
                         </table>
                     </div>
 
-                    <!-- Modal Tambah Akun Admin -->
                     <div x-show="isAddAdmin"
                         class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50"
                         x-cloak>
@@ -292,7 +277,6 @@
                             @csrf
                             <h3 class="text-lg font-medium text-gray-900 mb-4">Tambah Akun Admin Bidang Baru</h3>
 
-                            <!-- Nama -->
                             <div>
                                 <x-input-label for="add_name" value="Nama" />
                                 <x-text-input id="add_name" name="name" type="text" class="mt-1 block w-full"
@@ -300,7 +284,6 @@
                                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
 
-                            <!-- Email -->
                             <div class="mt-4">
                                 <x-input-label for="add_email" value="Email" />
                                 <x-text-input id="add_email" name="email" type="email" class="mt-1 block w-full"
@@ -308,7 +291,6 @@
                                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
                             </div>
 
-                            <!-- Bidang -->
                             <div class="mt-4">
                                 <x-input-label for="add_id_bidang" value="Tugaskan ke Bidang (Opsional)" />
                                 <select id="add_id_bidang" name="id_bidang"
@@ -324,7 +306,6 @@
                                 </select>
                             </div>
 
-                            <!-- Password -->
                             <div class="mt-4">
                                 <x-input-label for="add_password" value="Password" />
                                 <x-text-input id="add_password" name="password" type="password"
@@ -332,7 +313,6 @@
                                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
                             </div>
 
-                            <!-- Konfirmasi Password -->
                             <div class="mt-4">
                                 <x-input-label for="add_password_confirmation" value="Konfirmasi Password" />
                                 <x-text-input id="add_password_confirmation" name="password_confirmation"
@@ -351,7 +331,6 @@
                         </form>
                     </div>
 
-                    <!-- Modal Edit Akun Admin -->
                     <div x-show="isEditAdmin"
                         class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50"
                         x-cloak>
@@ -363,21 +342,18 @@
                             @method('PUT')
                             <h3 class="text-lg font-medium text-gray-900 mb-4">Edit Akun Admin Bidang</h3>
 
-                            <!-- Nama -->
                             <div>
                                 <x-input-label for="edit_name" value="Nama" />
                                 <x-text-input id="edit_name" name="name" type="text" class="mt-1 block w-full"
                                     x-model="selectedAdmin.name" required />
                             </div>
 
-                            <!-- Email -->
                             <div class="mt-4">
                                 <x-input-label for="edit_email" value="Email" />
                                 <x-text-input id="edit_email" name="email" type="email" class="mt-1 block w-full"
                                     x-model="selectedAdmin.email" required />
                             </div>
 
-                            <!-- Bidang -->
                             <div class="mt-4">
                                 <x-input-label for="edit_id_bidang" value="Tugaskan ke Bidang" />
                                 <select id="edit_id_bidang" name="id_bidang" x-model="selectedBidangId"
@@ -395,7 +371,6 @@
                                 </select>
                             </div>
 
-                            <!-- Status -->
                             <div class="mt-4">
                                 <x-input-label for="edit_status" value="Status Akun" />
                                 <select id="edit_status" name="status_aktif"
@@ -406,7 +381,6 @@
                                 </select>
                             </div>
 
-                            <!-- Password -->
                             <div class="mt-4">
                                 <x-input-label for="edit_password" value="Password Baru (Opsional)" />
                                 <x-text-input id="edit_password" name="password" type="password"
@@ -429,7 +403,6 @@
                         </form>
                     </div>
 
-                    <!-- Modal Hapus Akun Admin -->
                     <div x-show="isDeleteAdmin"
                         class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50"
                         x-cloak>

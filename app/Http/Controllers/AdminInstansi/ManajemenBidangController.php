@@ -22,7 +22,6 @@ class ManajemenBidangController extends Controller
         return redirect()->route('admin-instansi.manajemen-bidang.index')->with('success', 'Bidang baru berhasil ditambahkan.');
     }
 
-    // Mengupdate nama bidang
     public function update(Request $request, Bidang $bidang)
     {
         $request->validate([
@@ -34,25 +33,20 @@ class ManajemenBidangController extends Controller
             ],
         ]);
 
-        // Update data bidang yang dipilih
         $bidang->update([
             'nama_bidang' => $request->nama_bidang,
         ]);
 
-        // Kembali ke halaman sebelumnya dengan pesan sukses
         return redirect()->route('admin-instansi.manajemen-bidang.index')->with('success', 'Nama bidang berhasil diubah.');
     }
     public function destroy(Bidang $bidang)
     {
-       if ($bidang->penempatan()->exists()) {
-            // Jika ada, GAGALKAN penghapusan dan beri pesan error.
+        if ($bidang->penempatan()->exists()) {
             return redirect()->route('admin-instansi.manajemen-bidang.index')->with('error', 'Gagal! Tidak bisa menghapus bidang karena masih ada mahasiswa yang ditempatkan.');
         }
 
-        // Jika tidak ada mahasiswa, lanjutkan proses hapus.
         $bidang->delete();
 
-        // Kembali ke halaman sebelumnya dengan pesan sukses
         return redirect()->route('admin-instansi.manajemen-bidang.index')->with('success', 'Bidang berhasil dihapus.');
     }
 }

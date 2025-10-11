@@ -5,7 +5,6 @@
         <div class="bg-white p-8 rounded-xl shadow-lg border">
             <h2 class="text-xl font-semibold mb-4">Daftar Dokumen Masuk</h2>
 
-            {{-- Menampilkan pesan sukses atau error --}}
             @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
                 role="alert">
@@ -30,13 +29,11 @@
                     <tbody>
                         @forelse ($daftarDokumen as $antrian)
                         <tr class="border-b">
-                            {{-- PERBAIKAN 1: Menampilkan nama dari relasi user --}}
                             <td class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap">{{ $antrian->user->name ??
                                 'Nama tidak ditemukan' }}</td>
                             <td class="py-4 px-6">
                                 @if($antrian->dokumen)
                                 <div class="flex flex-col space-y-1">
-                                    {{-- PERBAIKAN 2: Mengubah link menjadi route download --}}
                                     <a href="{{ route('admin-instansi.verifikasi-dokumen.download', ['dokumen' => $antrian->dokumen, 'tipe' => 'pengantar']) }}"
                                         class="text-blue-600 hover:underline text-sm">Lihat Surat Pengantar</a>
                                     <a href="{{ route('admin-instansi.verifikasi-dokumen.download', ['dokumen' => $antrian->dokumen, 'tipe' => 'bankesbangpol']) }}"
@@ -49,7 +46,6 @@
                             <td class="py-4 px-6 text-center">
                                 @if($antrian->dokumen)
                                 <div class="flex justify-center gap-2">
-                                    <!-- Tombol Terima -->
                                     <form method="POST"
                                         action="{{ route('admin-instansi.verifikasi-dokumen.update', $antrian->dokumen) }}"
                                         onsubmit="return confirm('Anda yakin dokumen ini sudah lengkap?');">
@@ -59,7 +55,6 @@
                                             class="bg-green-500 text-white font-semibold py-1 px-3 rounded-lg text-sm">Terima</button>
                                     </form>
 
-                                    <!-- Tombol Revisi -->
                                     <button
                                         @click="showModal = true; selectedDokumen = {{ $antrian->dokumen }}; selectedAntrian = {{ $antrian }}"
                                         class="bg-yellow-500 text-white font-semibold py-1 px-3 rounded-lg text-sm">Revisi</button>
@@ -79,12 +74,10 @@
             </div>
         </div>
 
-        <!-- Modal untuk Catatan Revisi -->
         <div x-show="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
             x-cloak>
             <div @click.away="showModal = false" class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
                 <h3 class="text-lg font-bold mb-4">Catatan Revisi</h3>
-                {{-- PERBAIKAN 1 (lanjutan): Menampilkan nama di modal --}}
                 <p class="mb-4 text-sm">Anda meminta revisi untuk dokumen milik <strong
                         x-text="selectedAntrian && selectedAntrian.user ? selectedAntrian.user.name : ''"></strong>.</p>
                 <form

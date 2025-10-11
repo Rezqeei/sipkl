@@ -11,7 +11,6 @@
 
                 <h3 class="font-bold text-xl mb-4 text-gray-900">Daftar Mahasiswa Dari Admin Instansi</h3>
 
-                {{-- Notifikasi Sukses/Error dari Redirect --}}
                 @if(session('success'))
                 <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
                     {{ session('success') }}
@@ -23,7 +22,6 @@
                 </div>
                 @endif
 
-                {{-- PERBAIKAN PENTING: Menampilkan Error Validasi --}}
                 @if ($errors->any())
                 <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
                     <p class="font-bold">Oops! Ada beberapa masalah:</p>
@@ -35,7 +33,6 @@
                 </div>
                 @endif
 
-                <!-- Tabel Daftar Mahasiswa -->
                 <div class="overflow-x-auto relative shadow-md sm:rounded-lg">
                     <table class="w-full text-sm text-left text-gray-500">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
@@ -78,7 +75,6 @@
                     </table>
                 </div>
 
-                {{-- Loop Modal untuk setiap mahasiswa --}}
                 @foreach ($daftarPengajuan as $pengajuan)
                 <x-modal name="konfirmasi-mahasiswa-{{ $pengajuan->id_penempatan }}" focusable>
                     <form method="post"
@@ -103,7 +99,6 @@
                                 \Carbon\Carbon::parse($pengajuan->antrian->tgl_mulai)->format('d M Y') }} - {{
                                 \Carbon\Carbon::parse($pengajuan->antrian->tgl_berakhir)->format('d M Y') }}</p>
 
-                            {{-- Aksi Terima/Tolak --}}
                             <div class="pt-4 border-t">
                                 <div class="space-y-2">
                                     <label class="inline-flex items-center">
@@ -118,7 +113,6 @@
                                     </label>
                                 </div>
 
-                                <!-- Input teks untuk nama pembimbing -->
                                 <div x-show="action === 'terima'" class="mt-4">
                                     <label for="nama_pembimbing-{{$pengajuan->id_penempatan}}"
                                         class="text-sm font-medium">Nama Pembimbing</label>
@@ -128,8 +122,7 @@
                                         placeholder="Ketik nama pembimbing di sini..."
                                         value="{{ old('nama_pembimbing') }}">
                                 </div>
-
-                                {{-- Text Area Alasan Penolakan --}}
+                                
                                 <div x-show="action === 'tolak'" class="mt-2">
                                     <label for="alasan_penolakan-{{$pengajuan->id_penempatan}}"
                                         class="text-sm font-medium">Alasan Penolakan</label>

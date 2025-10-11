@@ -1,5 +1,4 @@
 <x-mahasiswa-layout>
-    {{-- Slot Header untuk menampilkan judul di Topbar --}}
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             Beranda
@@ -9,7 +8,6 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            {{-- Tampilkan pesan jika user baru dan $antrian KOSONG --}}
             @if(!$antrian)
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-8 text-center">
@@ -22,13 +20,8 @@
                     </a>
                 </div>
             </div>
-
-            {{-- JIKA USER SUDAH PUNYA DATA, TAMPILKAN SEMUA STATUS --}}
             @else
-            {{-- Kita gunakan Grid System: 2 kolom di layar medium, 1 kolom di layar kecil --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                <!-- Kartu Status Antrian PKL -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <h3 class="font-bold text-lg text-gray-900 mb-4">Status Antrian PKL</h3>
                     <div class="flex items-center space-x-2">
@@ -44,7 +37,6 @@
                     </div>
                 </div>
 
-                <!-- Kartu Status Dokumen -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <h3 class="font-bold text-lg text-gray-900 mb-4">Status Dokumen</h3>
                     <div class="flex items-center space-x-2">
@@ -60,7 +52,6 @@
                     </div>
                 </div>
 
-                <!-- Kartu Status Penempatan Bidang (memakan 2 kolom) -->
                 <div class="md:col-span-2 bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <h3 class="font-bold text-lg text-gray-900 mb-4">Status Penempatan Bidang</h3>
                     @if($antrian->penempatan)
@@ -78,7 +69,6 @@
                     @endif
                 </div>
 
-                <!-- Kartu Status Progress Laporan (memakan 2 kolom) -->
                 <div class="md:col-span-2 bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <h3 class="font-bold text-lg text-gray-900 mb-4">Status Progress Laporan</h3>
                     @if($antrian->penempatan)

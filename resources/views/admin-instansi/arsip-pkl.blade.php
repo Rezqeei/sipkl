@@ -2,7 +2,6 @@
     <div class="p-6 md:p-10">
         <h1 class="text-3xl font-bold text-gray-800 mb-6">Arsip Mahasiswa PKL</h1>
 
-        {{-- Notifikasi --}}
         @if (session('success'))
         <div class="mb-4 p-3 bg-green-100 border border-green-300 text-green-800 rounded-lg text-sm">
             {{ session('success') }}
@@ -18,17 +17,15 @@
                             <th class="py-3 px-6 text-left">Asal Kampus</th>
                             <th class="py-3 px-6 text-left">Bidang</th>
                             <th class="py-3 px-6 text-left">Periode Selesai</th>
-                            <th class="py-3 px-6 text-center">Aksi</th> {{-- Kolom Aksi --}}
+                            <th class="py-3 px-6 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($arsipMahasiswa as $arsip)
                         <tr class="border-b hover:bg-gray-50" x-data="{ showModal: false }">
-                            {{-- Mengambil nama dari relasi user --}}
                             <td class="py-4 px-6">{{ $arsip->antrian->user->name ?? 'N/A' }}</td>
                             <td class="py-4 px-6">{{ $arsip->antrian->nama_kampus }}</td>
                             <td class="py-4 px-6">{{ $arsip->bidang->nama_bidang }}</td>
-                            {{-- Mengambil tanggal berakhir dari antrian --}}
                             <td class="py-4 px-6">{{ \Carbon\Carbon::parse($arsip->antrian->tgl_berakhir)->format('d F
                                 Y') }}</td>
                             <td class="py-4 px-6 text-center">

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\AdminInstansi;
 use App\Http\Controllers\Controller;
 use App\Models\AntrianPKL;
 use App\Models\Bidang;
-use App\Models\Pembimbing;
 use App\Models\PenempatanPKL;
 use App\Models\User;
 use App\Notifications\PesanNotifikasi;
@@ -15,24 +14,16 @@ class PenempatanController extends Controller
 {
     public function index()
     {
-        // 1. Ambil semua mahasiswa yang dokumennya sudah lengkap ('Dokumen Lengkap')
         $mahasiswaSiap = AntrianPKL::where('status_antrian', 'Dokumen Lengkap')
             ->with('user')
             ->get();
 
-        // 2. Ambil semua bidang untuk pilihan dropdown
         $daftarBidang = Bidang::orderBy('nama_bidang')->get();
 
-        // 3. Kirim kedua data tersebut ke view
         return view('admin-instansi.penempatan-mahasiswa', compact('mahasiswaSiap', 'daftarBidang'));
     }
-
-    /**
-     * Menyimpan data penempatan mahasiswa ke sebuah bidang.
-     */
     public function store(Request $request)
     {
-        // 1. Validasi input dari form
         $request->validate([
             'antrian_id' => 'required|exists:antrian_pkl,id_antrian',
             'id_bidang' => 'required|exists:bidangs,id',

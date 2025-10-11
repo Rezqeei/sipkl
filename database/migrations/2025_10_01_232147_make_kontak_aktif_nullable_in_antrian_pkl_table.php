@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::table('antrian_pkl', function (Blueprint $table) {
             Schema::table('antrian_pkl', function (Blueprint $table) {
-                // Ubah kolom 'kontak_aktif' agar bisa menerima nilai NULL
                 $table->string('kontak_aktif')->nullable()->change();
             });
         });

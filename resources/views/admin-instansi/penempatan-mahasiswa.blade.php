@@ -55,7 +55,6 @@
             </div>
         </div>
 
-        <!-- Modal Detail Penempatan -->
         <div x-show="showModal" x-cloak class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
             style="z-index: 1000;">
             <div @click.away="showModal = false"
@@ -107,8 +106,6 @@
                             <p><span class="font-bold text-gray-800">Tanggal Berakhir:</span> <span
                                     x-text="new Date(selectedAntrian.tgl_berakhir).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })"></span>
                             </p>
-
-                            {{-- PERBAIKAN: Input nama pembimbing sudah dihapus dari sini --}}
 
                         </div>
                     </div>

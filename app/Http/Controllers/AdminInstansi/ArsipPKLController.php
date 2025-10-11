@@ -26,14 +26,12 @@ class ArsipPKLController extends Controller
             'file_sk' => 'required|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
-        // Simpan file SK
         $filePath = $request->file('file_sk')->store('surat_keterangan', 'public');
 
-        // Buat atau update record di tabel surat_keterangan
         SuratKeterangan::updateOrCreate(
             ['id_penempatan' => $arsip->id_penempatan],
             [
-                'nomor_surat' => 'SK-' . time(), // Anda bisa sesuaikan format nomor surat
+                'nomor_surat' => 'SK-' . time(), 
                 'tanggal_terbit' => now(),
                 'file_surat' => $filePath,
             ]

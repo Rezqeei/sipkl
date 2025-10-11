@@ -14,7 +14,6 @@
         <div class="bg-white p-6 md:p-10 rounded-xl shadow-lg border border-gray-100">
             <h2 class="text-xl font-semibold mb-8 text-center text-gray-700">Unggah Laporan Akhir Anda Dibawah Ini</h2>
 
-            {{-- PESAN SUKSES --}}
             @if (session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
                 role="alert">
@@ -97,7 +96,6 @@
         function resetFile(fileInputId, filenameDisplayId, defaultText) {
             const oldInput = document.getElementById(fileInputId);
             
-            // 1. Membuat duplikat elemen input file
             const newInput = document.createElement('input');
             newInput.type = 'file';
             newInput.name = oldInput.name;
@@ -105,12 +103,10 @@
             newInput.accept = oldInput.accept;
             newInput.className = oldInput.className;
             newInput.required = oldInput.required;
-            newInput.onchange = oldInput.onchange; // Menyalin fungsi onchange
+            newInput.onchange = oldInput.onchange;
 
-            // 2. Mengganti elemen lama dengan elemen baru (Ini yang mereset file)
             oldInput.parentNode.replaceChild(newInput, oldInput);
 
-            // 3. Mereset teks nama file
             document.getElementById(filenameDisplayId).textContent = defaultText;
         }
     </script>

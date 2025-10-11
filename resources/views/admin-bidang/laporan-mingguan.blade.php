@@ -11,7 +11,6 @@
                 <div class="p-6 md:p-8 text-gray-900">
                     <h3 class="text-2xl font-bold text-gray-800 mb-6">Daftar Laporan Mingguan Mahasiswa</h3>
 
-                    {{-- Notifikasi untuk pesan sukses atau error --}}
                     @if(session('success'))
                     <div class="mb-4 p-4 bg-green-100 text-green-800 border border-green-300 rounded-lg">
                         {{ session('success') }}
@@ -23,7 +22,6 @@
                     </div>
                     @endif
 
-                    {{-- Tabel Laporan --}}
                     <div class="overflow-x-auto border rounded-lg">
                         <table class="min-w-full bg-white">
                             <thead class="bg-gray-50">
@@ -47,7 +45,6 @@
                                 <tr class="hover:bg-gray-50">
                                     <td class="py-3 px-4 text-sm text-gray-500">{{ $loop->iteration }}</td>
 
-                                    {{-- INI BAGIAN PALING PENTING: MENAMPILKAN NAMA MAHASISWA --}}
                                     <td class="py-3 px-4 text-sm font-medium text-gray-900">{{
                                         $laporan->penempatan->mahasiswa->name ?? 'Data Mahasiswa Tidak Ditemukan' }}
                                     </td>
@@ -57,7 +54,6 @@
                                     <td class="py-3 px-4 text-sm text-center text-gray-600">{{ $laporan->minggu_ke }}
                                     </td>
                                     <td class="py-3 px-4 text-center">
-                                        {{-- Badge Status dengan Warna --}}
                                         @if ($laporan->status_verifikasi == 'Disetujui')
                                         <span
                                             class="px-2.5 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Disetujui</span>
@@ -71,7 +67,6 @@
                                     </td>
                                     <td class="py-3 px-4 text-center">
                                         <div class="flex items-center justify-center space-x-2">
-                                            {{-- Tombol Unduh --}}
                                             <a href="{{ route('admin-bidang.monitoring.laporan.mingguan.download', $laporan->id_laporan_mingguan) }}"
                                                 class="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition"
                                                 title="Unduh">
@@ -83,7 +78,6 @@
                                                     </path>
                                                 </svg>
                                             </a>
-                                            {{-- Tombol Setujui --}}
                                             <form
                                                 action="{{ route('admin-bidang.monitoring.laporan.mingguan.verify', $laporan->id_laporan_mingguan) }}"
                                                 method="POST" class="inline-block">
@@ -99,7 +93,6 @@
                                                     </svg>
                                                 </button>
                                             </form>
-                                            {{-- Tombol Tolak --}}
                                             <form
                                                 action="{{ route('admin-bidang.monitoring.laporan.mingguan.verify', $laporan->id_laporan_mingguan) }}"
                                                 method="POST" class="inline-block">
