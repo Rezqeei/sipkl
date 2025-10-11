@@ -1,75 +1,117 @@
 <x-admin-bidang-layout>
-    <div class="p-6 md:p-10">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">Informasi Kuota Bidang</h1>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Kuota Bidang') }}
+        </h2>
+    </x-slot>
 
-        @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <strong class="font-bold">Error!</strong>
-                <span class="block sm:inline">{{ session('error') }}</span>
-            </div>
-        @elseif(!$bidang)
-            {{-- Tampilan jika admin belum terhubung ke bidang --}}
-            <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert">
-                <strong class="font-bold">Perhatian!</strong>
-                <span class="block sm:inline">Akun Anda belum terhubung dengan Bidang manapun. Silakan hubungi Admin Instansi.</span>
-            </div>
-        @else
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Kolom Informasi & Form -->
-                <div class="lg:col-span-1 space-y-6">
-                    <!-- Informasi Bidang -->
-                    <div class="bg-white p-6 rounded-xl shadow-lg border">
-                        <h2 class="text-xl font-semibold mb-4 text-gray-700">Informasi Bidang</h2>
-                        <div class="space-y-3 text-gray-600">
-                            <p><strong>Nama Bidang:</strong><br> {{ $bidang->nama_bidang }}</p>
-                            <p><strong>Kuota Maksimal:</strong><br> <span class="text-2xl font-bold text-blue-600">{{ $bidang->kuota_maksimal }} Orang</span></p>
-                            <p><strong>Mahasiswa Aktif:</strong><br> <span class="text-2xl font-bold text-green-600">{{ $bidang->penempatan->sum('antrian.jumlah_orang') }} Orang</span></p>
-                            <p><strong>Sisa Kuota:</strong><br> <span class="text-2xl font-bold text-yellow-600">{{ $bidang->sisa_kuota }} Orang</span></p>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+
+                    @if(session('success'))
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
+                        role="alert">
+                        <strong class="font-bold">Sukses!</strong>
+                        <span class="block sm:inline">{{ session('success') }}</span>
+                    </div>
+                    @endif
+
+                    @if(session('error'))
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+                        role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <span class="block sm:inline">{{ session('error') }}</span>
+                    </div>
+                    @endif
+
+                    @if ($errors->any())
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+                        role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+
+                    @if($bidang)
+                    <!-- Informasi Kuota -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-gray-50 p-6 rounded-lg shadow">
+                            <h3 class="font-semibold text-lg mb-2">Informasi Bidang</h3>
+                            <p><strong>Nama Bidang:</strong> {{ $bidang->nama_bidang }}</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-lg shadow">
+                            <h3 class="font-semibold text-lg mb-2">Informasi Kuota</h3>
+                            <p><strong>Kuota Maksimal:</strong> {{ $bidang->kuota }}</p>
+                            <p><strong>Mahasiswa Aktif:</strong> {{ $mahasiswaAktifCount }}</p>
+                            <p><strong>Sisa Kuota:</strong> {{ $sisaKuota }}</p>
                         </div>
                     </div>
-                    <!-- Form Edit Kuota -->
-                    <div class="bg-white p-6 rounded-xl shadow-lg border">
-                        <h2 class="text-xl font-semibold mb-4 text-gray-700">Form Edit Kuota</h2>
-                        <form method="POST" action="{{ route('admin-bidang.kuota-bidang.update') }}">
+
+                    <!-- Form Update Kuota -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold text-lg mb-2">Update Kuota</h3>
+                        {{-- PERBAIKAN: Mengganti nama route yang salah --}}
+                        <form action="{{ route('admin-bidang.kuota-bidang.update') }}" method="POST">
                             @csrf
-                            <div>
-                                <label for="kuota_maksimal" class="block font-medium">Kuota Maksimal Baru</label>
-                                <input type="number" name="kuota_maksimal" id="kuota_maksimal" value="{{ $bidang->kuota_maksimal }}" class="w-full mt-1 p-2 border rounded-lg" min="0" required>
-                            </div>
-                            <div class="mt-4">
-                                <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">Simpan</button>
+                            @method('PUT')
+                            <div class="flex items-center">
+                                <x-text-input id="kuota" name="kuota" type="number" class="mt-1 block w-full md:w-1/4"
+                                    :value="$bidang->kuota" required />
+                                <x-primary-button class="ml-3">
+                                    {{ __('Update') }}
+                                </x-primary-button>
                             </div>
                         </form>
                     </div>
-                </div>
 
-                <!-- Kolom Daftar Mahasiswa Aktif -->
-                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border">
-                    <h2 class="text-xl font-semibold mb-4 text-gray-700">Daftar Mahasiswa Aktif di Bidang Ini</h2>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="py-3 px-4 text-left">Nama Mahasiswa</th>
-                                    <th class="py-3 px-4 text-left">Asal Kampus</th>
-                                    <th class="py-3 px-4 text-left">Periode PKL</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($bidang->penempatan as $penempatan)
-                                    <tr class="border-b">
-                                        <td class="py-4 px-4">{{ $penempatan->antrian->nama_lengkap }}</td>
-                                        <td class="py-4 px-4">{{ $penempatan->antrian->nama_kampus }}</td>
-                                        <td class="py-4 px-4">{{ \Carbon\Carbon::parse($penempatan->antrian->tgl_mulai)->format('d M Y') }} - {{ \Carbon\Carbon::parse($penempatan->antrian->tgl_berakhir)->format('d M Y') }}</td>
+                    <!-- Daftar Mahasiswa Aktif -->
+                    <div>
+                        <h3 class="font-semibold text-lg mb-4">Daftar Mahasiswa PKL Aktif</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white">
+                                <thead class="bg-gray-800 text-white">
+                                    <tr>
+                                        <th class="w-1/12 py-3 px-4 uppercase font-semibold text-sm text-left">No</th>
+                                        <th class="w-4/12 py-3 px-4 uppercase font-semibold text-sm text-left">Nama
+                                            Mahasiswa</th>
+                                        <th class="w-4/12 py-3 px-4 uppercase font-semibold text-sm text-left">Asal
+                                            Kampus</th>
+                                        <th class="w-3/12 py-3 px-4 uppercase font-semibold text-sm text-left">Periode
+                                        </th>
                                     </tr>
-                                @empty
-                                    <tr><td colspan="3" class="py-4 px-4 text-center text-gray-500">Tidak ada mahasiswa aktif.</td></tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody class="text-gray-700">
+                                    @forelse($mahasiswaAktif as $index => $penempatan)
+                                    <tr>
+                                        <td class="py-3 px-4">{{ $index + 1 }}</td>
+                                        <td class="py-3 px-4">{{ $penempatan->mahasiswa->name }}</td>
+                                        <td class="py-3 px-4">{{ $penempatan->antrian->nama_kampus }}</td>
+                                        <td class="py-3 px-4">{{
+                                            \Carbon\Carbon::parse($penempatan->antrian->tgl_mulai)->format('d M Y') }} -
+                                            {{ \Carbon\Carbon::parse($penempatan->antrian->tgl_berakhir)->format('d M
+                                            Y') }}</td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4">Tidak ada mahasiswa aktif saat ini.
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+                    @else
+                    <p>Informasi bidang untuk akun Anda tidak ditemukan. Harap hubungi Admin Instansi.</p>
+                    @endif
                 </div>
             </div>
-        @endif
+        </div>
     </div>
 </x-admin-bidang-layout>

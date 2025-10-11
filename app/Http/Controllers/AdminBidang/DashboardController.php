@@ -8,29 +8,67 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\PenempatanPKL;
 use App\Models\AntrianPKL;
 use App\Models\Bidang;
+use App\Models\LaporanMingguan;
 use App\Models\User;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $admin = Auth::user();
-        $bidang = $admin->bidang;
+        $user = Auth::user();
+        $bidang = $user->bidangDikelola;
 
-        if ($bidang) {
-            $jumlahMahasiswa = PenempatanPKL::where('id_bidang', $bidang->id)->count();
-            $jumlahAntrian = AntrianPKL::where('id_bidang', $bidang->id)->count();
-            $kuotaTersedia = $bidang->kuota - PenempatanPKL::where('id_bidang', $bidang->id)->count();
-        } else {
-            $jumlahMahasiswa = 0;
-            $jumlahAntrian = 0;
-            $kuotaTersedia = 0;
+        if (!$bidang) {
+            return view('admin-bidang.dashboard', ['bidang' => null]);
         }
-        return view('admin-bidang.dashboard', [
-            'totalMahasiswa' => $jumlahMahasiswa,
-            'totalAntrian' => $jumlahAntrian,
-            'kuotaTersedia' => $kuotaTersedia,
-            'bidang' => $bidang,
-        ]);
+
+        $mahasiswaAktifCount = PenempatanPKL::where('id_bidang', $bidang->id)
+            ->where('status_pkl', 'Sedang Berjalan')
+            ->count();
+
+        $sisaKuota = $bidang->kuota - $mahasiswaAktifCount;
+
+        $menungguKonfirmasiCount = PenempatanPKL::where('id_bidang', $bidang->id)
+            ->where('status_pkl', 'Menunggu Konfirmasi Bidang')
+            ->count();
+
+        $daftarMenungguKonfirmasi = PenempatanPKL::with('mahasiswa', 'antrian')
+            ->where('id_bidang', $bidang->id)
+            ->where('status_pkl', 'Menunggu Konfirmasi Bidang')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $penempatanDiBidang = PenempatanPKL::with('antrian')->where('id_bidang', $bidang->id)->get();
+        $idMahasiswaDiBidang = $penempatanDiBidang->map(function ($penempatan) {
+            if ($penempatan->antrian) {
+                return $penempatan->antrian->id_mahasiswa;
+            }
+            return null;
+        })->filter();
+
+        $laporanTerbaru = collect();
+        $laporanPerluDicekCount = 0;
+
+        if ($idMahasiswaDiBidang->isNotEmpty()) {
+            $laporanTerbaru = LaporanMingguan::whereIn('id_mahasiswa', $idMahasiswaDiBidang)
+                ->with('mahasiswa')
+                ->latest()
+                ->take(5)
+                ->get();
+
+            $laporanPerluDicekCount = LaporanMingguan::whereIn('id_mahasiswa', $idMahasiswaDiBidang)
+                ->where('status_verifikasi', 'Menunggu Verifikasi')->count();
+        }
+
+        return view('admin-bidang.dashboard', compact(
+            'bidang',
+            'mahasiswaAktifCount',
+            'sisaKuota',
+            'menungguKonfirmasiCount',
+            'laporanPerluDicekCount',
+            'daftarMenungguKonfirmasi',
+            'laporanTerbaru'
+        ));
     }
 }
