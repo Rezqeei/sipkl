@@ -60,14 +60,14 @@ class KonfirmasiMahasiswaController extends Controller
                 'id_pembimbing' => $pembimbing->id,
             ]);
 
-            $pesan = "Selamat! Pengajuan PKL Anda di " . $bidang->nama_bidang . " telah diterima. Pembimbing Anda adalah " . $pembimbing->nama_pembimbing . ".";
+            $pesan = "Selamat, Penempatan Anda di {$bidang->nama_bidang} telah diterima. Pembimbing Anda adalah {$pembimbing->nama_pembimbing}. Selanjutnya silahkan ke Dinas Komunikasi dan Informatika Garut untuk mengambil surat balasannya.";
             $url = route('mahasiswa.dashboard');
             $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
 
-            $message = 'Mahasiswa ' . $mahasiswa->name . ' telah diterima dan sedang menjalankan PKL.';
+            $message = "Penempatan Mahasiswa {$mahasiswa->name} telah diterima, di {$bidang->nama_bidang} dan nama pembimbing nya adalah {$pembimbing->nama_pembimbing}.";
         } else {
             $adminsInstansi = User::where('role', 'admin_instansi')->get();
-            $pesanAdmin = "Penempatan untuk " . $mahasiswa->name . " di " . $bidang->nama_bidang . " ditolak oleh Admin Bidang. Silakan tempatkan kembali.";
+            $pesanAdmin = "Penempatan untuk {$mahasiswa->name} di bidang {$bidang->nama_bidang} ditolak dikarenakan penuh, silakan tempatkan kembali untuk {$mahasiswa->name} tersebut.";
             $urlAdmin = route('admin-instansi.penempatan.index');
             Notification::send($adminsInstansi, new PesanNotifikasi($pesanAdmin, $urlAdmin));
 
@@ -77,7 +77,7 @@ class KonfirmasiMahasiswaController extends Controller
                 $antrian->update(['status_antrian' => 'Dokumen Lengkap']);
             }
 
-            $message = 'Mahasiswa telah ditolak dan dikembalikan ke daftar penempatan Admin Instansi.';
+            $message = "Penempatan anda di bidang {$bidang->nama_bidang} telah ditolak, tunggu penempatan bidang selanjutnya dari Admin Instansi.";
         }
 
         return redirect()->route('admin-bidang.konfirmasi-mahasiswa')->with('success', $message);

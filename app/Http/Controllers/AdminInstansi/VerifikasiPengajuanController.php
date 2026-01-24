@@ -34,7 +34,7 @@ class VerifikasiPengajuanController extends Controller
             ]);
             $message = 'Pengajuan untuk ' . $antrian->user->name . ' telah DITERIMA.';
 
-            $pesan = "Selamat! Pengajuan PKL Anda telah diterima. Silakan segera unggah dokumen yang diperlukan.";
+            $pesan = "Selamat! Pengajuan antrian PKL Anda telah diterima. Silakan segera unggah dokumen yang diperlukan.";
             $url = route('mahasiswa.unggah.dokumen');
             $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
         } else {
@@ -43,7 +43,7 @@ class VerifikasiPengajuanController extends Controller
                 'alasan_penolakan' => $request->alasan_penolakan,
             ]);
             $message = 'Pengajuan untuk ' . $antrian->user->name . ' telah DITOLAK.';
-            $pesan = "Maaf, pengajuan PKL Anda ditolak. Alasan: " . $request->alasan_penolakan;
+            $pesan = "Maaf, pengajuan antrian PKL Anda ditolak. Alasan: {$request->alasan_penolakan}";
             $url = route('mahasiswa.dashboard');
             $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
         }

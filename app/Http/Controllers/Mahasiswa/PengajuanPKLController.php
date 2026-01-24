@@ -9,6 +9,8 @@ use App\Notifications\PesanNotifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\Rule;
+
 
 class PengajuanPKLController extends Controller
 {
@@ -28,7 +30,14 @@ class PengajuanPKLController extends Controller
     {
         $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:255',
-            'nim' => 'required|string|max:20|unique:antrian_pkl,nim',
+            'nim' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('antrian_pkl', 'nim')->where(function ($query) {
+                    return $query->where('status_antrian', '!=', 'Ditolak');
+                }),
+            ],
             'jurusan' => 'required|string|max:100',
             'nama_kampus' => 'required|string|max:100',
             'alamat' => 'required|string|max:1000',
@@ -51,7 +60,7 @@ class PengajuanPKLController extends Controller
         ]);
 
         $adminsInstansi = User::where('role', 'admin_instansi')->get();
-        $pesan = "Pengajuan PKL baru dari " . $validated['nama_lengkap'] . " perlu diverifikasi.";
+        $pesan = "Pengajuan antrian PKL baru dari {$validated['nama_lengkap']} perlu diverifikasi.";
         $url = route('admin-instansi.verifikasi-pengajuan.index');
 
         Notification::send($adminsInstansi, new PesanNotifikasi($pesan, $url));

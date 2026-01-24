@@ -43,7 +43,7 @@ class PenempatanController extends Controller
         $antrian->update(['status_antrian' => 'Ditempatkan']);
         $adminBidang = User::find($bidang->id_admin_bidang);
         if ($adminBidang) {
-            $pesan = "Mahasiswa baru (" . $antrian->user->name . ") telah ditempatkan di bidang Anda dan menunggu konfirmasi.";
+            $pesan = "Mahasiswa baru ({$antrian->user->name}) telah ditempatkan di bidang Anda dan menunggu konfirmasi.";
             $url = route('admin-bidang.konfirmasi-mahasiswa');
             $adminBidang->notify(new PesanNotifikasi($pesan, $url));
         }

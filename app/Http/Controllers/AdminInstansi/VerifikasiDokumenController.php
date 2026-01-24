@@ -38,7 +38,7 @@ class VerifikasiDokumenController extends Controller
             $antrian->update(['status_antrian' => 'Dokumen Lengkap']);
             $message = 'Dokumen untuk ' . $antrian->user->name . ' telah disetujui.';
 
-            $pesan = "Kabar baik! Dokumen Anda telah diverifikasi dan dinyatakan lengkap. Tunggu penempatan dari admin.";
+            $pesan = "Selamat, Dokumen Persyaratan Anda Disetujui, selanjutnya silahkan menunggu informasi lebih lanjut.";
             $url = route('mahasiswa.dashboard');
             $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
         } else {
@@ -50,7 +50,7 @@ class VerifikasiDokumenController extends Controller
             $antrian->update(['status_antrian' => 'Revisi Dokumen']);
             $message = 'Dokumen untuk ' . $antrian->user->name . ' ditandai untuk revisi.';
 
-            $pesan = "Dokumen Anda perlu direvisi. Silakan periksa catatan dan unggah kembali. Catatan: " . $request->catatan_revisi;
+            $pesan = "Dokumen Persyaratan Anda perlu direvisi. Silakan periksa catatan dan unggah kembali. Catatan: {$request->catatan_revisi}";
             $url = route('mahasiswa.unggah.dokumen');
             $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
         }

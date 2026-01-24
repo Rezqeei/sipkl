@@ -79,7 +79,7 @@ class DokumenController extends Controller
 
         $antrian->update(['status_antrian' => 'Menunggu Verifikasi Dokumen']);
         $adminsInstansi = User::where('role', 'admin_instansi')->get();
-        $pesan = "Dokumen dari " . $antrian->nama_lengkap . " telah diunggah dan perlu diverifikasi.";
+        $pesan = "Dokumen dari mahasiswa {$antrian->user->name} telah diunggah dan menunggu verifikasi.";
         $url = route('admin-instansi.verifikasi-dokumen.index');
 
         Notification::send($adminsInstansi, new PesanNotifikasi($pesan, $url));

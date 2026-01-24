@@ -43,11 +43,11 @@ class LaporanPKLController extends Controller
             'status_verifikasi' => 'Menunggu Verifikasi',
         ]);
 
-        $adminBidang = $penempatan->bidang->admin;
+        $adminBidang = $penempatan->bidang->adminBidang;
         if ($adminBidang) {
             $mahasiswa = Auth::user();
-            $pesan = "Laporan mingguan ke-" . $request->minggu_ke . " dari " . $mahasiswa->name . " telah diunggah.";
-            $url = route('admin-bidang.monitoring-laporan.mingguan');
+            $pesan = "Laporan mingguan ke-{$request->minggu_ke} dari {$mahasiswa->name} telah diunggah.";
+            $url = route('admin-bidang.monitoring.laporan.mingguan');
             $adminBidang->notify(new PesanNotifikasi($pesan, $url));
         }
 
@@ -83,11 +83,11 @@ class LaporanPKLController extends Controller
             'status_verifikasi' => 'Menunggu Verifikasi',
         ]);
 
-        $adminBidang = $penempatan->bidang->admin;
+        $adminBidang = $penempatan->bidang->adminBidang;
         if ($adminBidang) {
             $mahasiswa = Auth::user();
-            $pesan = "Laporan akhir dari " . $mahasiswa->name . " telah diunggah dan perlu verifikasi.";
-            $url = route('admin-bidang.monitoring-laporan.akhir');
+            $pesan = "Laporan akhir dari {$mahasiswa->name} telah diunggah dan perlu verifikasi.";
+            $url = route('admin-bidang.monitoring.laporan.akhir');
             $adminBidang->notify(new PesanNotifikasi($pesan, $url));
         }
 

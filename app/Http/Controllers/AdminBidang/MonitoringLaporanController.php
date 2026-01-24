@@ -9,6 +9,8 @@ use App\Notifications\PesanNotifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
+use Illuminate\Support\Facades\Notification;
 
 class MonitoringLaporanController extends Controller
 {
@@ -41,9 +43,9 @@ class MonitoringLaporanController extends Controller
         }
         $laporan->update(['status_verifikasi' => $request->status_verifikasi]);
         $mahasiswa = $laporan->penempatan->mahasiswa;
+        $status = $request->status_verifikasi;
         if ($mahasiswa) {
-            $status = $request->status_verifikasi;
-            $pesan = "Laporan mingguan Anda (Minggu ke-{$laporan->minggu_ke}) telah diverifikasi dengan status: {$status}.";
+            $pesan = "Laporan mingguan Anda (Minggu ke-{$laporan->minggu_ke}) telah diverifikasi dengan status {$status} .";
             $url = route('mahasiswa.laporan.mingguan');
             $mahasiswa->notify(new PesanNotifikasi($pesan, $url));
         }
@@ -86,8 +88,11 @@ class MonitoringLaporanController extends Controller
         $laporan->feedback = $request->status_verifikasi === 'Ditolak' ? $request->feedback : null;
         $laporan->save();
 
+        $mahasiswa = $laporan->penempatan->antrian->user;
+        $status = $request->status_verifikasi;
+
         if ($request->status_verifikasi === 'Disetujui') {
-            $laporan->penempatan->update(['status_pkl' => 'Selesai']);
+             $laporan->penempatan->update(['status_pkl' => 'Selesai']);
         }
         $mahasiswa = $laporan->penempatan->antrian->user;
         $status = strtolower($request->action);
