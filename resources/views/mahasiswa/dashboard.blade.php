@@ -25,14 +25,17 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <h3 class="font-bold text-lg text-gray-900 mb-4">Status Antrian PKL</h3>
                     <div class="flex items-center space-x-2">
+                        @php
+                        $status = $antrian->status_antrian;
+                        @endphp
                         <span
-                            class="px-3 py-1 text-sm font-semibold rounded-full {{ optional($antrian)->status_antrian == 'Diterima' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600' }}">✓
+                            class="px-3 py-1 text-sm font-semibold rounded-full {{ in_array($status, ['Diterima', 'Menunggu Verifikasi Dokumen', 'Dokumen Lengkap', 'Ditempatkan', 'Revisi Dokumen', 'Selesai']) ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600' }}">✓
                             Diterima</span>
                         <span
-                            class="px-3 py-1 text-sm font-semibold rounded-full {{ optional($antrian)->status_antrian == 'Menunggu Verifikasi' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-200 text-gray-600' }}">⏳
+                            class="px-3 py-1 text-sm font-semibold rounded-full {{ $status == 'Menunggu Verifikasi' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-200 text-gray-600' }}">⏳
                             Menunggu</span>
                         <span
-                            class="px-3 py-1 text-sm font-semibold rounded-full {{ optional($antrian)->status_antrian == 'Ditolak' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-600' }}">✗
+                            class="px-3 py-1 text-sm font-semibold rounded-full {{ $status == 'Ditolak' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-600' }}">✗
                             Ditolak</span>
                     </div>
                 </div>
