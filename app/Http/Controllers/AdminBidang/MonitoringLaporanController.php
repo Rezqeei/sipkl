@@ -89,18 +89,25 @@ class MonitoringLaporanController extends Controller
         $laporan->save();
 
         $mahasiswa = $laporan->penempatan->antrian->user;
-        $status = $request->status_verifikasi;
 
         if ($request->status_verifikasi === 'Disetujui') {
              $laporan->penempatan->update(['status_pkl' => 'Selesai']);
+             $namaMahasiswa = $mahasiswa->name;
+             $pesanAdmin = "Laporan akhir mahasiswa {$namaMahasiswa} telah disetujui, segera untuk kirim SK selesai PKL di arsip PKL.";
+             $urlAdmin = route('admin-instansi.arsip-pkl.index');
+             $admins = User::where('role', 'admin_instansi')->get();
+             foreach ($admins as $admin) {
+            $admin->notify(new PesanNotifikasi($pesanAdmin, $urlAdmin));
+            }
         }
+
         $mahasiswa = $laporan->penempatan->antrian->user;
-        $status = strtolower($request->action);
-        $pesan = "Laporan akhir Anda telah diverifikasi dengan status: {$status}.";
+        $status = $request->status_verifikasi;
+        $pesan = "Laporan akhir Anda telah diverifikasi dengan status {$status}.";
         if ($request->action == 'Revisi') {
             $pesan .= " Catatan: " . $request->feedback;
         } elseif ($request->action == 'Diterima') {
-            $pesan .= " Selamat, Anda telah menyelesaikan PKL! Silakan download Surat Keterangan Selesai.";
+            $pesan .= "Selamat, Anda telah menyelesaikan PKL! Silakan download Surat Keterangan Selesai PKL";
         }
         $url = route('mahasiswa.laporan.akhir');
         $mahasiswa->notify(new PesanNotifikasi($pesan, $url));

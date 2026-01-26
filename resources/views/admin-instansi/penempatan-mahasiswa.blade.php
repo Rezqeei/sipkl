@@ -80,8 +80,6 @@
                                 x-text="selectedAntrian.jurusan"></span></p>
                         <p><span class="font-bold text-gray-800">Kampus:</span> <span
                                 x-text="selectedAntrian.nama_kampus"></span></p>
-                        <p><span class="font-bold text-gray-800">No HP:</span> <span
-                                x-text="selectedAntrian.kontak_aktif || '-'"></span></p>
                         <p><span class="font-bold text-gray-800">Email:</span> <span
                                 x-text="selectedAntrian.user.email"></span></p>
 
