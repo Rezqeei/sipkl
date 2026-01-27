@@ -31,7 +31,6 @@
                         <tr>
                             <th class="py-3 px-4 text-left">Minggu Ke</th>
                             <th class="py-3 px-4 text-left">Status</th>
-                            <th class="py-3 px-4 text-left">Feedback</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -39,7 +38,6 @@
                         <tr class="border-b">
                             <td class="py-4 px-4">{{ $laporan->minggu_ke }}</td>
                             <td class="py-4 px-4">{{ $laporan->status_verifikasi }}</td>
-                            <td class="py-4 px-4">{{ $laporan->feedback ?? '-' }}</td>
                         </tr>
                         @empty
                         <tr>
